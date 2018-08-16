@@ -12,6 +12,7 @@ from handlers.chatshandler import ChatsHandler
 from handlers.wshandler import WebSocketHandler
 from BD-tools.alchemy import CUsers, CMessages
 
+
 define("port", default=8888, help="start on the given port", type=int)
 POSTGRES_SERVER = 'localhost'
 POSTGRES_PORT = '5432'
@@ -38,11 +39,13 @@ class Application(tornado.web.Application):
         tornado.web.Application.__init__(self, handlers, **settings)
 
         # bd connection
+
         db_address = 'postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(POSTGRES_LOGIN, POSTGRES_PASS, POSTGRES_SERVER,
                                                                POSTGRES_PORT,
                                                                POSTGRES_BASE)
         engine = create_engine(db_address)
         self.db = sessionmaker(bind=engine)()
+
 
 
 class MainHandler(BaseHandler):
