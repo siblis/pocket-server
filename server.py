@@ -3,13 +3,15 @@ import tornado.escape
 import tornado.httpserver
 import tornado.ioloop
 import tornado.websocket
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, sessionmaker
 from tornado.options import define, options
 from handlers.jsonhandler import BaseHandler
 from handlers.authhandler import AuthHandler
 from handlers.usershandler import UsersHandler
 from handlers.chatshandler import ChatsHandler
 from handlers.wshandler import WebSocketHandler
+from BD-tools.alchemy import CUsers, CMessages
+
 
 define("port", default=8888, help="start on the given port", type=int)
 POSTGRES_SERVER = 'localhost'
@@ -37,10 +39,13 @@ class Application(tornado.web.Application):
         tornado.web.Application.__init__(self, handlers, **settings)
 
         # bd connection
-        db_address = 'postgresql://{0}:{1}@{2}:{3}/{4}'.format(POSTGRES_LOGIN, POSTGRES_PASS, POSTGRES_SERVER,
+
+        db_address = 'postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(POSTGRES_LOGIN, POSTGRES_PASS, POSTGRES_SERVER,
                                                                POSTGRES_PORT,
                                                                POSTGRES_BASE)
-        self.db = create_engine(db_address)
+        engine = create_engine(db_address)
+        self.db = sessionmaker(bind=engine)()
+
 
 
 class MainHandler(BaseHandler):
