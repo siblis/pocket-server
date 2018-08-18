@@ -2,13 +2,10 @@ from sqlalchemy import Column, Integer, Unicode, UniqueConstraint, ForeignKey, M
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
-
-
-
 CBase = declarative_base()
 
-class CUsers(CBase):
 
+class CUsers(CBase):
     __tablename__ = 'users'
 
     uid = Column(Integer(), primary_key=True)
@@ -34,6 +31,5 @@ class CMessages(CBase):
     p_to_id = relationship('CUsers', foreign_keys=[to_id])
 
     def __repr__(self):
-        return 'CMessages<mid = %d, from_id = %d, to_id = %d, message = %s' % (self.mid, self.from_id, self.to, self.message)
-
-
+        return 'CMessages<mid = %d, from_id = %d, to_id = %d, message = %s' % (
+            self.mid, self.from_id, self.to, self.message)
