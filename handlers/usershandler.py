@@ -1,6 +1,7 @@
 from handlers.json_util import JsonHandler
 from database_tools.alchemy import CUsers
 from database_tools.db_connect import Session
+import secrets
 
 session = Session()
 
@@ -22,7 +23,8 @@ class UsersHandler(JsonHandler):
                     user = self.json_data['account_name']
                     password = self.json_data['password']
                     email = self.json_data['email']
-                    user = CUsers(username=user, password=password, email=email, token='')
+                    token = secrets.token_hex(8)
+                    user = CUsers(username=user, password=password, email=email, token=token)
                     session.add(user)
                     session.commit()
                     self.set_status(201, reason='Created')
