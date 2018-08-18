@@ -33,4 +33,4 @@ class CMessages(CBase):
 
     def __repr__(self):
         return 'CMessages<mid = %d, from_id = %d, to_id = %d, message = %s' % (
-            self.mid, self.from_id, self.to, self.message)
+            self.mid, self.from_id, self.to_id, self.message)

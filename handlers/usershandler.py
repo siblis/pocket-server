@@ -8,14 +8,11 @@ session = Session()
 
 class UsersHandler(JsonHandler):
     def get(self):
-        if self._token_check(session, CUsers):
-            users_set = session.query(CUsers).all()
-
-            for user in users_set:
-                self.write(str(user) + "\n")
+        if self._token_check(session):
+            self._get_elements(session, CUsers)
 
     def post(self):
-        if self._token_check(session, CUsers):
+        if self._token_check(session):
             try:
                 result = session.query(CUsers.username).filter(
                     CUsers.username == self.json_data['account_name']).one_or_none()

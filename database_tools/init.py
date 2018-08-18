@@ -1,4 +1,4 @@
-from sqlalchemy import Table, Column, Integer, String, ForeignKey, MetaData
+from sqlalchemy import Table, Column, Integer, String, ForeignKey, MetaData, DateTime
 from sqlalchemy import create_engine
 from database_tools.db_connect import POSTGRES_SERVER, POSTGRES_PORT, POSTGRES_LOGIN, POSTGRES_PASS, POSTGRES_BASE
 
@@ -19,7 +19,7 @@ messages = Table('messages', meta,
                  Column('mid', Integer, primary_key=True),
                  Column('to_id', Integer, ForeignKey('users.uid')),
                  Column('from_id', Integer, ForeignKey('users.uid')),
-                 Column('content', String),
-                 Column('dtime', Integer))
+                 Column('message', String),
+                 Column('dtime', DateTime))
 
 meta.create_all(engine)
