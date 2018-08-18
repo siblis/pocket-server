@@ -1,23 +1,33 @@
 import tornado.escape
 import tornado.web
-import json
+
 
 class BaseHandler(tornado.web.RequestHandler):
     @property
     def db(self):
         return self.application.db
 
+
 class JsonHandler(BaseHandler):
+    def _token_check(self, session, CUsers):
+        token_db = None
+        token = None
+        if 'token' in self.request.headers:
+            token = self.request.headers['token']
+            token_db = session.query(CUsers.token).filter(CUsers.token == token).one_or_none()
+            if token_db is not None and token == token_db.token:
+                return True
+            else:
+                message = 'Token not found'
+                self.send_error(404, message=message)
+        else:
+            message = 'Unauthorized'
+            self.send_error(401, message=message)
+
     def prepare(self):
         if self.request.body:
             try:
-                # print(self.request.body)
-                # для дебага через curl
-                arg = self.request.body
-                arg = arg.decode()
-                arg = arg.replace("'", '"')
-
-                self.json_data = tornado.escape.json_decode(arg)
+                self.json_data = tornado.escape.json_decode(self.request.body.decode('utf8'))
             except ValueError:
                 message = 'Unable to parse JSON.'
                 self.send_error(400, message=message)  # Bad Request
@@ -38,5 +48,5 @@ class JsonHandler(BaseHandler):
         self.write_json()
 
     def write_json(self):
-        output = json.dumps(self.response)
+        output = tornado.escape.json_encode(self.response)
         self.write(output)
