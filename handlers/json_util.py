@@ -1,5 +1,6 @@
 import tornado.escape
 import tornado.web
+from database_tools.alchemy import CUsers
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -9,7 +10,13 @@ class BaseHandler(tornado.web.RequestHandler):
 
 
 class JsonHandler(BaseHandler):
-    def _token_check(self, session, CUsers):
+    def _get_elements(self, session, CElem):
+        elem_set = session.query(CElem).all()
+
+        for elem in elem_set:
+            self.write(str(elem) + "\n")
+
+    def _token_check(self, session):
         token_db = None
         token = None
         if 'token' in self.request.headers:
