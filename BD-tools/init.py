@@ -23,7 +23,7 @@ messages = Table('messages', meta,
                  Column('mid', Integer, primary_key=True),
                  Column('to_id', Integer, ForeignKey('users.uid')),
                  Column('from_id', Integer, ForeignKey('users.uid')),
-                 Column('content', String),
+                 Column('message', String),
                  Column('dtime', Integer))
 
 meta.create_all(engine)

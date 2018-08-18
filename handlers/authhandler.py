@@ -1,7 +1,9 @@
 from handlers.jsonhandler import JsonHandler
+from handlers.jsonhandler import BaseHandler.db as db
 import secrets
 import hashlib
 from salt import salt
+from BD-tools.alchemy import CUsers, CMessages
 
 
 class AuthHandler(JsonHandler):
@@ -15,19 +17,14 @@ class AuthHandler(JsonHandler):
         login = self.json_data['user']
         passwd = self.json_data['password']
         passwd = self.create_sha(passwd)
-        query = "SELECT COUNT(login) FROM users WHERE login = '" + self.json_data['user'] + "'"
-        result = self.db.execute(query)
-        result = result.fetchall()
-        if len(result) > 0:
-            query = "SELECT password FROM users WHERE login = '" + self.json_data['user'] + "'"
-            result = self.db.execute(query)
-            result = result.fetchone()
-            result_sha = result[0]
-            
+        exists = db.query(CUsers).filter_by(username=login).all()
+        if exists:
+            result_sha = db.query(CUsers.password).filter_by(username=login).first()[0]
             if passwd == result_sha:
                 self.write('You logged success\n')
                 token = secrets.token_hex(32)
-                # TODO запись token, user, pass в БД
+                #  запись token
+                db.query(CUsers).filter(CUsers.login == login).update({CUsers.token: token}, synchronize_session='evaluate')
                 self.response['token'] = token
                 self.response['response'] = '200'
                 self.write_json()
