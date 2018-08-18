@@ -1,5 +1,4 @@
-from handlers.jsonhandler import JsonHandler, BaseHandler
-from BD-tools.alchemy import CUsers
+from handlers.jsonhandler import JsonHandler
 
 
 class UsersHandler(JsonHandler):
