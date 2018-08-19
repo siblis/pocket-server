@@ -22,4 +22,9 @@ messages = Table('messages', meta,
                  Column('message', String),
                  Column('dtime', DateTime))
 
+contacts = Table('contacts'. meta,
+                 Column('cid', Integer, primary_key=True),
+                 Column('user_id', Integer, ForeignKey('users.uid')),
+                 Column('contact', Integer, ForeignKey('users.uid')))
+
 meta.create_all(engine)
