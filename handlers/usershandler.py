@@ -1,39 +1,33 @@
-from handlers.jsonhandler import JsonHandler
+from handlers.json_util import JsonHandler
+from database_tools.alchemy import CUsers
+from database_tools.db_connect import Session
+import secrets
+
+session = Session()
 
 
 class UsersHandler(JsonHandler):
     def get(self):
-        # TODO token сверить с БД
-        # TODO если токен есть вывести список всех юзеров
-        result_set = self.db.execute("SELECT id, login, is_admin, last_login FROM users")
-        for r in result_set:
-            self.write(str(r) + "\n")
+        if self._token_check(session):
+            self._get_elements(session, CUsers)
 
     def post(self):
-        # add user to db
-        # token сверить
-        # если токен верный проверить данные
-        # если данных нет в БД, записать, иначе выдать ошибку
-
-        if self.json_data:
-            query = "SELECT id FROM users WHERE token = '" + self.json_data['token'] + "'"
-            result = self.db.execute(query)
-            result_len = len(result.fetchall())
-            # print(result_len)
-            if result_len > 0:
-                print('token ok')
-                print('next check data')
-                query = "SELECT id FROM users WHERE login = '" + self.json_data['adduser'] + "'"
-                result = self.db.execute(query)
-
-                result_len = len(result.fetchall())
-                if result_len > 0:
-                    print('error add, write exists')
+        if self._token_check(session):
+            try:
+                result = session.query(CUsers.username).filter(
+                    CUsers.username == self.json_data['account_name']).one_or_none()
+                if result is None:
+                    user = self.json_data['account_name']
+                    password = self.json_data['password']
+                    email = self.json_data['email']
+                    token = secrets.token_hex(8)
+                    user = CUsers(username=user, password=password, email=email, token=token)
+                    session.add(user)
+                    session.commit()
+                    self.set_status(201, reason='Created')
                 else:
-                    print('create new str in bd')
-                    self.response['response'] = '200'
-                    self.write_json()
-            else:
-                self.response['message'] = 'token is wrong'
-                self.response['response'] = '403'
-                self.write_json()
+                    message = 'Conflict'
+                    self.send_error(409, message=message)
+
+            except:
+                self.send_error(400)
