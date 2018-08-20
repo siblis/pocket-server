@@ -21,15 +21,17 @@ class JsonHandler(BaseHandler):
         token = None
         if 'token' in self.request.headers:
             token = self.request.headers['token']
-            token_db = session.query(CUsers.token).filter(CUsers.token == token).one_or_none()
+            token_db = session.query(CUsers).filter(CUsers.token == token).one_or_none()
             if token_db is not None and token == token_db.token:
-                return True
+                return token_db.uid
             else:
                 message = 'Token not found'
                 self.send_error(404, message=message)
         else:
             message = 'Unauthorized'
             self.send_error(401, message=message)
+
+
 
     def prepare(self):
         if self.request.body:

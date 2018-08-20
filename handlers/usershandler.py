@@ -31,3 +31,13 @@ class UsersHandler(JsonHandler):
 
             except:
                 self.send_error(400)
+
+    def put(self):
+        uid = self._token_check(session)
+        if uid:
+            contact = self.json_data['contact']
+            new_contact = CContacts(user_id=uid, contact=contact)
+            session.add(new_contact)
+            session.commit()
+            self.set_status(201, reason='Created')
+
