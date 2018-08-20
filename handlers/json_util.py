@@ -16,6 +16,12 @@ class JsonHandler(BaseHandler):
         for elem in elem_set:
             self.write(str(elem) + "\n")
 
+    def _get_filtered(self, session, CElem, uid):
+        elem_set = session.query(CElem).filter_by(uid=uid).all()
+
+        for elem in elem_set:
+            self.write(str(elem) + "\n")
+
     def _token_check(self, session):
         token_db = None
         token = None

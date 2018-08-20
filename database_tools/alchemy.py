@@ -14,6 +14,7 @@ class CUsers(CBase):
     email = Column(Unicode())
     token = Column(Unicode())
     check_1 = UniqueConstraint('username')
+    check_2 = UniqueConstraint('email')
 
     def __repr__(self):
         return 'CUsers<uid = %d, login = %s' % (self.uid, self.username)
