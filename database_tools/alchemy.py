@@ -14,6 +14,7 @@ class CUsers(CBase):
     email = Column(Unicode())
     token = Column(Unicode())
     check_1 = UniqueConstraint('username')
+    check_2 = UniqueConstraint('email')
 
     def __repr__(self):
         return 'CUsers<uid = %d, login = %s' % (self.uid, self.username)
@@ -34,3 +35,13 @@ class CMessages(CBase):
     def __repr__(self):
         return 'CMessages<mid = %d, from_id = %d, to_id = %d, message = %s' % (
             self.mid, self.from_id, self.to_id, self.message)
+
+
+class CContacts(CBase):
+    __tablename__ = 'contacts'
+    cid = Column(Integer(), primary_key=True)
+    user_id = Column(Integer(), ForeignKey('users.uid'))
+    contact = Column(Integer(), ForeignKey('users.uid'))
+
+    def __repr__(self):
+        return 'CContacts<cid = %d, user_id = %d, contact = %d' % (self.cid, self.user_id, self.contact)
