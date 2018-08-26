@@ -1,0 +1,7 @@
+#ignore
+/.idea/*
+/__pycache__
+/handlers/__pycache__
+/database_tools/__pycache__
+salt.py
+
