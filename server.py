@@ -15,7 +15,7 @@ define("port", default=8888, help="start on the given port", type=int)
 
 
 class Application(tornado.web.Application):
-    def __init__(self):
+    def __init__(self, db=Session()):
         self.webSocketsPool = []
         handlers = [
             (r'/v1', MainHandler),
@@ -32,8 +32,7 @@ class Application(tornado.web.Application):
         settings = dict()
         tornado.web.Application.__init__(self, handlers, **settings)
 
-        self.db = Session()
-
+        self.db = db
 
 class MainHandler(BaseHandler):
     def get(self):
