@@ -36,8 +36,6 @@ class TestUsersHandler(AsyncHTTPTestCase):
         self.session.commit()
 
         self.db = self.session
-        print(self.db.query(CUsers).all())
-
         super().setUp()
 
     def get_app(self):
