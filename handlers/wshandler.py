@@ -3,11 +3,9 @@ import uuid
 from handlers.json_util import JsonHandler
 from database_tools.db_connect import Session
 
-session = Session()
-
 
 class WebSocketHandler(tornado.websocket.WebSocketHandler, JsonHandler):
-    ws_clients = []
+    ws_dict = dict()
 
     @staticmethod
     def _gen_session():
@@ -15,32 +13,31 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler, JsonHandler):
 
     def prepare(self):
         if 'Token' in self.request.headers:
-            self._token_check(session)
+            self.uid = self._token_check(self.db)
         else:
             self.close(401)
 
-    def check_origin(self, origin):
-        return True
-
     def open(self):
+        temp_list = []
         print("WebSocket opened")
+        # ген сессии
         self.session = self._gen_session()
+        temp_list.append(self.uid)
+        temp_list.append(self)
+        # обьект ws
         self.application.webSocketsPool.append(self)
-        self.ws_clients.append(self.session)
-        print(self.ws_clients)
+        # словарь ключ сессия, объект ws
+        self.ws_dict[self.session] = temp_list
 
     def on_message(self, message):
+        print(self.ws_dict)
         self.write_message(u"You said: " + message)
-        print(f'Come message {message} from {self.session}')
+        print(f'Come message {message} from id {self.uid} and sessid {self.session}')
 
-        for key, value in enumerate(self.application.webSocketsPool):
-            if value != self:
-                value.ws_connection.write_message(message)
+        for key in self.ws_dict.keys():
+            if key != self.session:
+                self.ws_dict[key][1].write_message(message)
 
     def on_close(self):
         print("WebSocket closed")
-        self.ws_clients.remove(self.session)
-        for key, value in enumerate(self.application.webSocketsPool):
-            if value == self:
-                del self.application.webSocketsPool[key]
-        print(self.ws_clients)
+        self.ws_dict.pop(self.session)
