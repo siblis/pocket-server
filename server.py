@@ -15,7 +15,9 @@ define("port", default=8888, help="start on the given port", type=int)
 
 
 class Application(tornado.web.Application):
-    def __init__(self, db=Session()):
+    def __init__(self, db=None):
+        if db == None:
+            db = Session()
         self.webSocketsPool = []
         handlers = [
             (r'/v1', MainHandler),
@@ -34,6 +36,7 @@ class Application(tornado.web.Application):
 
         self.db = db
 
+
 class MainHandler(BaseHandler):
     def get(self):
         result = "Welcome to server"
@@ -43,7 +46,10 @@ class MainHandler(BaseHandler):
 def main():
     print('Start server')
     tornado.options.parse_command_line()
-    http_server = tornado.httpserver.HTTPServer(Application())
+    http_server = tornado.httpserver.HTTPServer(Application(), ssl_options={
+        "certfile": "/var/www/ca/fullchain.pem",
+        "keyfile": "/var/www/ca/privkey.pem",
+    })
     http_server.listen(options.port)
     tornado.ioloop.IOLoop.instance().start()
 
