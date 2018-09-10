@@ -22,7 +22,8 @@ class JsonHandler(BaseHandler):
         for elem in elem_set:
             self.write(str(elem) + "\n")
 
-    def _token_check(self, session):
+    def _token_check(self):
+        session = self.db
         token_db = None
         token = None
         if 'token' in self.request.headers:
