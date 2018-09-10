@@ -6,7 +6,7 @@ import secrets
 
 class UsersHandler(JsonHandler):
     def get(self):
-        uid = self._token_check(self.db)
+        uid = self._token_check()
         if uid:
             # пока убрал запросы ко всей бд, потому как сейчас отсутствует реализация пользователя-админа
             # self._get_elements(session, CUsers)
@@ -35,7 +35,7 @@ class UsersHandler(JsonHandler):
             self.send_error(400)
 
     def put(self):
-        uid = self._token_check(self.db)
+        uid = self._token_check()
         if uid:
             contact = self.json_data['contact']
             contact = self.db.query(CUsers).filter(CUsers.email == contact).one_or_none()
