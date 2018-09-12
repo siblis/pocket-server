@@ -6,7 +6,7 @@ from typing import NamedTuple
 
 class UserData(NamedTuple):
     user_id: int
-    ws_object: object
+    ws_object: 'WebSocketHandler'
 
 
 class WebSocketHandler(tornado.websocket.WebSocketHandler, JsonHandler):
