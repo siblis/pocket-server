@@ -3,5 +3,6 @@
 /__pycache__
 /handlers/__pycache__
 /database_tools/__pycache__
+/database_tools/db_config.py
 salt.py
 
