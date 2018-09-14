@@ -15,6 +15,6 @@ Base = declarative_base()
 def connect(dbname):
     db_address = 'postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(POSTGRES_LOGIN, POSTGRES_PASS, POSTGRES_SERVER,
                                                                     POSTGRES_PORT,
-                                                                    POSTGRES_BASE)
+                                                                    dbname)
     engine = create_engine(db_address)
     return engine
