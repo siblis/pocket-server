@@ -21,11 +21,11 @@ class Application(tornado.web.Application):
         self.webSocketsPool = []
         handlers = [
             (r'/v1', MainHandler),
-            (r'/v1/auth', AuthHandler),
-            (r'/v1/users', UsersHandler),
+            (r'/v1/auth/', AuthHandler),
+            (r'/v1/users/', UsersHandler),
             (r'/v1/users/add', UsersHandler),
             (r'/v1/ws/', WebSocketHandler),
-            (r'/v1/chats', ChatsHandler),
+            (r'/v1/chats/', ChatsHandler),
             (r'/v1/chats/add', ChatsHandler),
         ]
 
