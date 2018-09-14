@@ -47,12 +47,12 @@ class TestUsersHandler(AsyncHTTPTestCase):
         self.session.close()
 
     def test_userspage_get_unauthorized(self):
-        response = self.fetch('/v1/users')
+        response = self.fetch('/v1/users/')
         self.assertEqual(response.code, 401)
 
     def test_userspage_get_authorized(self):
         headers = {'Content-Type': 'application/json', 'token': 'token'}
-        response = self.fetch('/v1/users', headers=headers)
+        response = self.fetch('/v1/users/', headers=headers)
         self.assertEqual(response.code, 200)
 
     def test_userpage_post_conflict(self):
@@ -62,7 +62,7 @@ class TestUsersHandler(AsyncHTTPTestCase):
             "password": "testpass",
             "email": "testemail"
         }
-        response = self.fetch('/v1/users', headers=headers, method='POST', body=json.dumps(body).encode('utf-8'))
+        response = self.fetch('/v1/users/', headers=headers, method='POST', body=json.dumps(body).encode('utf-8'))
         self.assertEqual(response.code, 409)
 
     def test_userpage_post_bad_request(self):
@@ -71,7 +71,7 @@ class TestUsersHandler(AsyncHTTPTestCase):
             "login": "new_user",
             "pass": "testpass",
         }
-        response = self.fetch('/v1/users', headers=headers, method='POST', body=json.dumps(body).encode('utf-8'))
+        response = self.fetch('/v1/users/', headers=headers, method='POST', body=json.dumps(body).encode('utf-8'))
         self.assertEqual(response.code, 400)
 
     def test_userpage_post_success(self):
@@ -81,5 +81,5 @@ class TestUsersHandler(AsyncHTTPTestCase):
             "password": "newtestpass",
             "email": "newtestemail"
         }
-        response = self.fetch('/v1/users', headers=headers, method='POST', body=json.dumps(body).encode('utf-8'))
+        response = self.fetch('/v1/users/', headers=headers, method='POST', body=json.dumps(body).encode('utf-8'))
         self.assertEqual(response.code, 201)

@@ -44,7 +44,7 @@ class TestAuthHandler(AsyncHTTPTestCase):
         return Application(self.db)
 
     def test_authpage_get(self):
-        response = self.fetch('/v1/auth')
+        response = self.fetch('/v1/auth/')
         self.assertEqual(response.code, 200)
         self.assertEqual(response.body, b'GET - Welcome to the AuthHandler!')
 
@@ -54,7 +54,7 @@ class TestAuthHandler(AsyncHTTPTestCase):
             'user': 'test',
             'password': '123TESTtestTEST123',
         }
-        response = self.fetch('/v1/auth', method='PUT', headers=headers, body=json.dumps(body).encode('utf-8'))
+        response = self.fetch('/v1/auth/', method='PUT', headers=headers, body=json.dumps(body).encode('utf-8'))
         resp_body = json.loads(response.body)
 
         self.assertEqual(resp_body['response'], '403')
@@ -66,7 +66,7 @@ class TestAuthHandler(AsyncHTTPTestCase):
             'user': 'WRONG_USER!',
             'password': 'ANDWRONGPASSTESTtestTEST',
         }
-        response = self.fetch('/v1/auth', method='PUT', headers=headers, body=json.dumps(body).encode('utf-8'))
+        response = self.fetch('/v1/auth/', method='PUT', headers=headers, body=json.dumps(body).encode('utf-8'))
         resp_body = json.loads(response.body)
 
         self.assertEqual(resp_body['response'], '403')
@@ -78,5 +78,5 @@ class TestAuthHandler(AsyncHTTPTestCase):
             'user': 'test',
             'password': 'test',
         }
-        response = self.fetch('/v1/auth', method='PUT', headers=headers, body=json.dumps(body).encode('utf-8'))
+        response = self.fetch('/v1/auth/', method='PUT', headers=headers, body=json.dumps(body).encode('utf-8'))
         self.assertEqual(response.code, 200)
