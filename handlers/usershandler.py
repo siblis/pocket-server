@@ -21,12 +21,15 @@ class UsersHandler(JsonHandler):
             if result is None:
                 user = self.json_data['account_name']
                 password = self.json_data['password']
+                password= self._create_sha(password)
                 email = self.json_data['email']
                 token = secrets.token_hex(8)
                 user = CUsers(username=user, password=password, email=email, token=token)
                 self.db.add(user)
                 self.db.commit()
                 self.set_status(201, reason='Created')
+                self.response['token'] = token
+                self.write_json()
             else:
                 message = 'Conflict'
                 self.send_error(409, message=message)

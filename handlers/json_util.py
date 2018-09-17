@@ -1,6 +1,8 @@
 import tornado.escape
 import tornado.web
 from database_tools.alchemy import CUsers
+import hashlib
+from salt import salt
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -10,6 +12,9 @@ class BaseHandler(tornado.web.RequestHandler):
 
 
 class JsonHandler(BaseHandler):
+    def _create_sha(self, string):
+        return hashlib.sha256(string.encode() + salt.encode()).hexdigest()
+
     def _get_elements(self, session, CElem):
         elem_set = session.query(CElem).all()
 
