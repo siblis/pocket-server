@@ -14,13 +14,13 @@ class AuthHandler(JsonHandler):
         exists = self.db.query(CUsers).filter_by(username=login).all()
         if exists:
             result_db = self.db.query(CUsers.password).filter_by(username=login).first()[0]
-            result_sha = self._create_sha(result_db)
-            if passwd == result_sha:
+            if passwd == result_db:
                 self.write('You logged success\n')
-                token = secrets.token_hex(32)
+                token = secrets.token_hex(8)
                 #  запись token
                 self.db.query(CUsers).filter(CUsers.username == login).update({CUsers.token: token},
-                                                                           synchronize_session='evaluate')
+                                                                              synchronize_session='evaluate')
+                self.db.commit()
                 self.response['token'] = token
                 self.response['response'] = '200'
                 self.write_json()
