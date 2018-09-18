@@ -20,8 +20,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler, JsonHandler):
         return uuid.uuid4()
 
     def prepare(self):
-        if self.request.query:
-            self.uid = self._ws_token_check(self.request.query)
+        if 'Token' in self.request.headers:
+            self.uid = self._token_check()
         else:
             self.close(401)
 
