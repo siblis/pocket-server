@@ -26,6 +26,21 @@ class JsonHandler(BaseHandler):
 
         for elem in elem_set:
             self.write(str(elem) + "\n")
+            
+    def _ws_token_check(self, token):
+        session = self.db
+        if self.request.query is not None:
+            token = self.request.query
+            token_db = session.query(CUsers).filter(CUsers.token == token).one_or_none()
+            if token_db is not None and token == token_db.token:
+                return token_db.uid
+            else:
+                message = 'Token not found'
+                self.send_error(404, message=message)
+        else:
+            message = 'Unauthorized'
+            self.send_error(401, message=message)
+
 
     def _token_check(self):
         session = self.db
