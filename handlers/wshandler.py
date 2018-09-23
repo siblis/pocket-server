@@ -3,7 +3,9 @@ import uuid
 from handlers.json_util import JsonHandler
 from typing import NamedTuple
 import tornado.escape
+import logging
 
+LOG_NAME = "/var/log/pocket/websocket.log"
 
 class UserData(NamedTuple):
     user_id: int
@@ -12,6 +14,7 @@ class UserData(NamedTuple):
 
 class WebSocketHandler(tornado.websocket.WebSocketHandler, JsonHandler):
     ws_dict = dict()
+    logging.basicConfig(filename=LOG_NAME, level=logging.INFO)
 
     def check_origin(self, origin):
         return True
@@ -23,19 +26,18 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler, JsonHandler):
         if 'Token' in self.request.headers:
             self.uid = self._token_check()
         else:
-            self.close(401)
+            logging.info('Token not found in headers')
+            logging.info(self.request.headers)
+            self.send_error(401)
 
     def open(self):
-        # TODO в лог
-        # print("WebSocket opened")
         self.session = self._gen_session()
+        logging.info(f'WebSocket opened, {self.session}')
         self.user_tuple = UserData(self.uid, self)
-
         self.ws_dict[self.session] = self.user_tuple
 
     def on_message(self, message):
-        #TODO в лог и этот принт
-        # print(f'Come message {message} from id {self.uid} and sessid {self.session}')
+        logging.info(f'Come message {message} from id {self.uid} and sessid {self.session}')
         json_data = ''
         try:
             json_data = tornado.escape.json_decode(message)
@@ -59,5 +61,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler, JsonHandler):
 
 
     def on_close(self):
-        # print("WebSocket closed")
-        self.ws_dict.pop(self.session)
+        logging.info(f'WebSocket closed, {self.session}')
+        try:
+            self.ws_dict.pop(self.session)
+        except:
+            logging.info("No session in DICT")
