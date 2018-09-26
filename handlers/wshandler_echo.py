@@ -11,16 +11,16 @@ import os
 LOG_PATCH = r'C:\\' 
 '''
 LOG_PATCH = '/var/log/pocket/'
-LOG_FILE_NAME = 'websocket.log'
+LOG_FILE_NAME = 'websocket_echo.log'
 LOG_FULL_PATH = os.path.join(LOG_PATCH, LOG_FILE_NAME)
 
 
 class UserData(NamedTuple):
     user_id: int
-    ws_object: 'WebSocketHandler'
+    ws_object: 'WebSocketHandlerEcho'
 
 
-class WebSocketHandler(tornado.websocket.WebSocketHandler, JsonHandler):
+class WebSocketHandlerEcho(tornado.websocket.WebSocketHandler, JsonHandler):
     ws_dict = dict()
     logging.basicConfig(filename=LOG_FULL_PATH, level=logging.INFO)
 
@@ -52,19 +52,13 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler, JsonHandler):
             json_data['sender'] = self.session
             json_data['senderid'] = self.uid
             for key in self.ws_dict.keys():
-                if key != self.session:
-                    if self.ws_dict[key].user_id == int(json_data['receiver']):
-                        self.ws_dict[key].ws_object.write_message(json_data['message'])
-                        self.write_message({"response": "200"})
-                    else:
-                        self.write_message({"response": "404", "message": "Client not found or not online"})
-                else:
-                    if len(self.ws_dict) == 1:
-                        self.write_message({"response": "404", "message": "Not found receiver"})
+                self.write_message(json_data)
         except ValueError:
             message = 'Unable to parse JSON'
             self.write_message({"response": "400", "message": message})
         except Exception as e:
+            logging.info(json_data)
+            logging.info(e)
             message = 'Bad JSON'
             self.write_message({"response": "400", "message": message})
 
