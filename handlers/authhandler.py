@@ -8,7 +8,7 @@ class AuthHandler(JsonHandler):
         self.write('GET - Welcome to the AuthHandler!')
 
     def put(self):
-        login = self.json_data['user']
+        login = self.json_data['account_name']
         passwd = self.json_data['password']
         passwd = self._create_sha(passwd)
         exists = self.db.query(CUsers).filter_by(username=login).all()
