@@ -4,15 +4,6 @@ from handlers.json_util import JsonHandler
 from typing import NamedTuple
 import tornado.escape
 import logging
-import os
-
-'''
-Пример для Windows: 
-LOG_PATCH = r'C:\\' 
-'''
-LOG_PATCH = '/var/log/pocket/'
-LOG_FILE_NAME = 'websocket_echo.log'
-LOG_FULL_PATH = os.path.join(LOG_PATCH, LOG_FILE_NAME)
 
 
 class UserData(NamedTuple):
@@ -22,7 +13,6 @@ class UserData(NamedTuple):
 
 class WebSocketHandlerEcho(tornado.websocket.WebSocketHandler, JsonHandler):
     ws_dict = dict()
-    logging.basicConfig(filename=LOG_FULL_PATH, level=logging.INFO)
 
     def check_origin(self, origin):
         return True
