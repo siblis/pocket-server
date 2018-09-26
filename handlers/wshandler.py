@@ -22,7 +22,8 @@ class UserData(NamedTuple):
 
 class WebSocketHandler(tornado.websocket.WebSocketHandler, JsonHandler):
     ws_dict = dict()
-    logging.basicConfig(filename=LOG_FULL_PATH, level=logging.INFO)
+    logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%d/%m/%Y %I:%M:%S %p', filename=LOG_FULL_PATH,
+                        level=logging.INFO)
 
     def check_origin(self, origin):
         return True
