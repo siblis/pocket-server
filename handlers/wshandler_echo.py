@@ -13,11 +13,9 @@ class WebSocketHandlerEcho(WebSocketHandler, UserData):
             json_data['sender'] = self.session
             json_data['senderid'] = self.uid
             self.write_message(json_data)
-        except ValueError:
-            message = 'Unable to parse JSON'
-            self.write_message({"response": "400", "message": message})
-        except Exception as e:
-            logging.info(json_data)
-            logging.info(e)
-            message = 'Bad JSON'
-            self.write_message({"response": "400", "message": message})
+        except:
+            if json_data == '':
+                request = message
+                self.write_message(f'Bad JSON, your request: {request}')
+            else:
+                self.write_message(f'Bad JSON, your request: {json_data}')
