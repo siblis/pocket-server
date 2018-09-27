@@ -1,17 +1,11 @@
 import tornado.websocket
 import uuid
-from handlers.json_util import JsonHandler
-from typing import NamedTuple
 import tornado.escape
 import logging
+from handlers.wshandler import UserData, WebSocketHandler
 
 
-class UserData(NamedTuple):
-    user_id: int
-    ws_object: 'WebSocketHandlerEcho'
-
-
-class WebSocketHandlerEcho(tornado.websocket.WebSocketHandler, JsonHandler):
+class WebSocketHandlerEcho(WebSocketHandler):
     ws_dict = dict()
 
     def check_origin(self, origin):
