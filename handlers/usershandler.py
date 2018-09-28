@@ -16,12 +16,21 @@ class UsersHandler(JsonHandler):
 
     def post(self):
         try:
+            result_email = self.db.query(CUsers.email).filter(CUsers.email == self.json_data['email']).all()
+            if len(result_email) > 0:
+                message = 'Conflict, mail exist'
+                self.send_error(409, message=message)
+        except KeyError:
+            self.send_error(400, message='Bad JSON, email need')
+
+        try:
             result = self.db.query(CUsers.username).filter(
                 CUsers.username == self.json_data['account_name']).one_or_none()
+
             if result is None:
                 user = self.json_data['account_name']
                 password = self.json_data['password']
-                password= self._create_sha(password)
+                password = self._create_sha(password)
                 email = self.json_data['email']
                 token = secrets.token_hex(8)
                 user = CUsers(username=user, password=password, email=email, token=token)
@@ -31,11 +40,11 @@ class UsersHandler(JsonHandler):
                 self.response['token'] = token
                 self.write_json()
             else:
-                message = 'Conflict'
+                message = 'Conflict, user exists'
                 self.send_error(409, message=message)
 
         except:
-            self.send_error(400)
+            self.send_error(400, message='Bad JSON, need account_name')
 
     def put(self):
         uid = self._token_check()
