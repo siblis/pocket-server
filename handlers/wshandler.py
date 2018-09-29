@@ -14,6 +14,7 @@ LOG_PATCH = '/var/log/pocket/'
 LOG_FILE_NAME = 'websocket.log'
 LOG_FULL_PATH = os.path.join(LOG_PATCH, LOG_FILE_NAME)
 
+
 class UserData(NamedTuple):
     user_id: int
     ws_object: 'WebSocketHandler'
@@ -21,13 +22,14 @@ class UserData(NamedTuple):
 
 class WebSocketHandler(tornado.websocket.WebSocketHandler, JsonHandler):
     ws_dict = dict()
-    logging.basicConfig(filename=LOG_FULL_PATH, level=logging.INFO)
+    logging.basicConfig(format='%(asctime)s %(message)s', datefmt='[%d/%m/%Y %H:%M:%S]', filename=LOG_FULL_PATH,
+                        level=logging.INFO)
 
     def check_origin(self, origin):
         return True
 
     def _gen_session(self):
-        return uuid.uuid4()
+        return str(uuid.uuid4())
 
     def prepare(self):
         if 'Token' in self.request.headers:
@@ -49,6 +51,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler, JsonHandler):
         try:
             json_data = tornado.escape.json_decode(message)
             json_data['sender'] = self.session
+            json_data['senderid'] = self.uid
             for key in self.ws_dict.keys():
                 if key != self.session:
                     if self.ws_dict[key].user_id == int(json_data['receiver']):
@@ -65,7 +68,6 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler, JsonHandler):
         except Exception as e:
             message = 'Bad JSON'
             self.write_message({"response": "400", "message": message})
-
 
     def on_close(self):
         logging.info(f'WebSocket closed, {self.session}')

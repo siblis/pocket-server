@@ -17,7 +17,7 @@ class CUsers(CBase):
     check_2 = UniqueConstraint('email')
 
     def __repr__(self):
-        return 'CUsers<uid = %d, login = %s' % (self.uid, self.username)
+        return 'CUsers: uid = %d, account_name = %s, email = %s' % (self.uid, self.username, self.email)
 
 
 class CMessages(CBase):
