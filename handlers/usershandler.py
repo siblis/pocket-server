@@ -1,11 +1,11 @@
 from handlers.json_util import JsonHandler
 from database_tools.alchemy import CUsers, CContacts
-from database_tools.db_connect import Session
+from tornado.web import RequestHandler
 import secrets
 
 
 class UsersHandler(JsonHandler):
-    def get(self):
+    def get(self, *args):
         uid = self._token_check()
         if uid:
             # пока убрал запросы ко всей бд, потому как сейчас отсутствует реализация пользователя-админа
@@ -57,3 +57,18 @@ class UsersHandler(JsonHandler):
             self.response['contact_uid'] = contact.uid
             self.response['response'] = '201'
             self.write_json()
+
+
+class UsersHandlerId(UsersHandler):
+    def get(self, user_id):
+        uid = self._token_check()
+        if uid:
+            result = self.db.query(CUsers).filter(CUsers.uid == user_id).one_or_none()
+            if result is None:
+                self.set_status(404, 'User not found')
+            else:
+                self.response['uid'] = result.uid
+                self.response['account_name'] = result.username
+                self.response['email'] = result.email
+                self.write_json()
+                self.set_status(200)
