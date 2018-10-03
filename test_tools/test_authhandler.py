@@ -7,7 +7,6 @@ from sqlalchemy.orm import sessionmaker
 from database_tools.alchemy import CUsers
 
 
-
 class TestAuthHandler(AsyncHTTPTestCase):
     def setUp(self):
         engine = connect('postgres')
@@ -24,11 +23,12 @@ class TestAuthHandler(AsyncHTTPTestCase):
                       Column('username', String),
                       Column('password', String),
                       Column('email', String),
-                      Column('token', String))
+                      Column('token', String),
+                      Column('tokenexp', String))
 
         meta.create_all(engine)
 
-        self.user = CUsers(username='test', password='test', email='testemail', token='token')
+        self.user = CUsers(username='test', password='test', email='testemail', token='token', tokenexp='2019-10-19 10:23:54')
         self.session.add(self.user)
         self.session.commit()
         self.db = self.session
@@ -51,31 +51,25 @@ class TestAuthHandler(AsyncHTTPTestCase):
     def test_authpage_put_wrong_password(self):
         headers = {'Content-Type': 'application/json'}
         body = {
-            'user': 'test',
+            'account_name': 'test',
             'password': '123TESTtestTEST123',
         }
         response = self.fetch('/v1/auth/', method='PUT', headers=headers, body=json.dumps(body).encode('utf-8'))
-        resp_body = json.loads(response.body)
-
-        self.assertEqual(resp_body['response'], '403')
-        self.assertEqual(resp_body['message'], 'Incorrect password')
+        self.assertEqual(response.code, 403)
 
     def test_authpage_put_wrong_cred(self):
         headers = {'Content-Type': 'application/json'}
         body = {
-            'user': 'WRONG_USER!',
+            'account_name': 'WRONG_USER!',
             'password': 'ANDWRONGPASSTESTtestTEST',
         }
         response = self.fetch('/v1/auth/', method='PUT', headers=headers, body=json.dumps(body).encode('utf-8'))
-        resp_body = json.loads(response.body)
-
-        self.assertEqual(resp_body['response'], '403')
-        self.assertEqual(resp_body['message'], 'Login or password incorrect')
+        self.assertEqual(response.code, 403)
 
     def test_authpage_put_good_cred(self):
         headers = {'Content-Type': 'application/json'}
         body = {
-            'user': 'test',
+            'account_name': 'test',
             'password': 'test',
         }
         response = self.fetch('/v1/auth/', method='PUT', headers=headers, body=json.dumps(body).encode('utf-8'))
