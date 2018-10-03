@@ -1,17 +1,20 @@
 from handlers.json_util import JsonHandler
 from database_tools.alchemy import CUsers, CContacts
-from tornado.web import RequestHandler
 import secrets
 
 
 class UsersHandler(JsonHandler):
     def get(self, *args):
-        uid = self._token_check()
-        if uid:
+        check_result = self._token_check()
+        if check_result:
             # пока убрал запросы ко всей бд, потому как сейчас отсутствует реализация пользователя-админа
             # self._get_elements(session, CUsers)
-            self._get_filtered(self.db, CUsers, uid)
-            self.response['response'] = '200'
+            # self._get_filtered(self.db, CUsers, uid)
+            result = self.db.query(CUsers).filter(CUsers.uid == check_result.uid).one_or_none()
+            self.response['uid'] = result.uid
+            self.response['account_name'] = result.username
+            self.response['email'] = result.email
+            self.set_status(200)
             self.write_json()
 
     def post(self):
@@ -33,7 +36,8 @@ class UsersHandler(JsonHandler):
                 password = self._create_sha(password)
                 email = self.json_data['email']
                 token = secrets.token_hex(8)
-                user = CUsers(username=user, password=password, email=email, token=token)
+                token_expire = self._token_expiration()
+                user = CUsers(username=user, password=password, email=email, token=token, tokenexp=token_expire)
                 self.db.add(user)
                 self.db.commit()
                 self.set_status(201, reason='Created')
@@ -43,7 +47,7 @@ class UsersHandler(JsonHandler):
                 message = 'Conflict, user exists'
                 self.send_error(409, message=message)
 
-        except:
+        except Exception as e:
             self.send_error(400, message='Bad JSON, need account_name')
 
     def put(self):
