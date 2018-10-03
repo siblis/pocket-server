@@ -15,21 +15,18 @@ class AuthHandler(JsonHandler):
         if exists:
             result_db = self.db.query(CUsers.password).filter_by(username=login).first()[0]
             if passwd == result_db:
-                self.write('You logged success\n')
                 token = secrets.token_hex(8)
+                token_exp = self._token_expiration()
                 #  запись token
-                self.db.query(CUsers).filter(CUsers.username == login).update({CUsers.token: token},
-                                                                              synchronize_session='evaluate')
+                self.db.query(CUsers).filter(CUsers.username == login).update(
+                    {CUsers.token: token, CUsers.tokenexp: token_exp},
+                    synchronize_session='evaluate')
                 self.db.commit()
+                self.set_status(200)
                 self.response['token'] = token
-                self.response['response'] = '200'
                 self.write_json()
             else:
-                self.response['message'] = 'Incorrect password'
-                self.response['response'] = '403'
-                self.write_json()
+                self.set_status(403, 'Incorrect password')
 
         else:
-            self.response['message'] = 'Login or password incorrect'
-            self.response['response'] = '403'
-            self.write_json()
+            self.set_status(403, reason='Login or password incorrect')
