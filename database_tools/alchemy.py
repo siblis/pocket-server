@@ -13,6 +13,7 @@ class CUsers(CBase):
     password = Column(Unicode())
     email = Column(Unicode())
     token = Column(Unicode())
+    tokenexp = Column(Unicode())
     check_1 = UniqueConstraint('username')
     check_2 = UniqueConstraint('email')
 
