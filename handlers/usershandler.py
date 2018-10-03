@@ -51,23 +51,24 @@ class UsersHandler(JsonHandler):
             self.send_error(400, message='Bad JSON, need account_name')
 
     def put(self):
-        uid = self._token_check()
-        if uid:
+        check_result = self._token_check()
+        if check_result:
             contact = self.json_data['contact']
             contact = self.db.query(CUsers).filter(CUsers.email == contact).one_or_none()
-            new_contact = CContacts(user_id=uid, contact=contact.uid)
-            self.db.add(new_contact)
-            self.db.commit()
-            self.response['contact_uid'] = contact.uid
-            self.response['response'] = '201'
-            self.write_json()
+            if contact is None:
+                self.set_status(404, 'Contact not found')
+            else:
+                new_contact = CContacts(user_id=check_result.uid, contact=contact.uid)
+                self.db.add(new_contact)
+                self.db.commit()
+                self.set_status(201, 'Created')
 
 
 class UsersHandlerId(UsersHandler):
     def get(self, user_id):
-        uid = self._token_check()
-        if uid:
-            result = self.db.query(CUsers).filter(CUsers.uid == user_id).one_or_none()
+        check_result = self._token_check()
+        if check_result:
+            result = self.db.query(CUsers).filter(CUsers.check_result.uid == user_id).one_or_none()
             if result is None:
                 self.set_status(404, 'User not found')
             else:
