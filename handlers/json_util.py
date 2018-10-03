@@ -43,19 +43,18 @@ class JsonHandler(BaseHandler):
             query_db = session.query(CUsers).filter(CUsers.token == token).one_or_none()
             if query_db is not None and token == query_db.token:
                 if query_db.tokenexp is None:
-                    self.send_error(401, reason='Your token expired')
+                    self.set_status(401, reason='Your token expired')
                 else:
-                    expiration_time = datetime.strptime(query_db.tokenexp, "%Y-%m-%d %H:%M:%S")
-                    if expiration_time < datetime.today():
-                        self.send_error(401, reason='Your token expired')
+                    if query_db.tokenexp < datetime.today():
+                        self.set_status(401, reason='Your token expired')
                     else:
                         return query_db
             else:
                 message = 'Token not found'
-                self.send_error(404, message=message)
+                self.set_status(404, reason=message)
         else:
             message = 'Unauthorized'
-            self.send_error(401, message=message)
+            self.set_status(401, reason=message)
 
 
 
