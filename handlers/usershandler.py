@@ -68,7 +68,7 @@ class UsersHandlerId(UsersHandler):
     def get(self, user_id):
         check_result = self._token_check()
         if check_result:
-            result = self.db.query(CUsers).filter(CUsers.check_result.uid == user_id).one_or_none()
+            result = self.db.query(CUsers).filter(CUsers.uid == user_id).one_or_none()
             if result is None:
                 self.set_status(404, 'User not found')
             else:
