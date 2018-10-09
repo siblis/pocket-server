@@ -31,7 +31,7 @@ class JsonHandler(BaseHandler):
     def _token_expiration(self):
         today = datetime.now()
         days = timedelta(days=5)
-        token_expire = (today + days).strftime("%Y-%m-%d %H:%M:%S")
+        token_expire = (today + days).timestamp()
         return token_expire
 
     def _token_check(self):
