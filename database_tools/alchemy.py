@@ -10,7 +10,7 @@ class CUsers(CBase):
 
     uid = Column(Integer(), primary_key=True)
     username = Column(Unicode(), unique=True)
-    password = Column(Unicode(), unique=True)
+    password = Column(Unicode())
     email = Column(Unicode())
     token = Column(Unicode(), unique=True)
     check_1 = UniqueConstraint('username')
