@@ -3,11 +3,8 @@ from database_tools.alchemy import CUsers, CContacts
 from tornado.web import RequestHandler
 import secrets
 
-from database_tools.work_with_db import ServerStorage   # Добавил класс из work_with_db.py
-
 
 class UsersHandler(JsonHandler):
-
     def get(self, *args):
         uid = self._token_check()
         if uid:
@@ -36,13 +33,9 @@ class UsersHandler(JsonHandler):
                 password = self._create_sha(password)
                 email = self.json_data['email']
                 token = secrets.token_hex(8)
-                # user = CUsers(username=user, password=password, email=email, token=token)
-                # self.db.add(user)
-                # self.db.commit()
-                ServerStorage().add_user(username=user,
-                                         password=password,
-                                         email=email,
-                                         token=token)   # Добавление нового юзера через work_with_db.py
+                user = CUsers(username=user, password=password, email=email, token=token)
+                self.db.add(user)
+                self.db.commit()
                 self.set_status(201, reason='Created')
                 self.response['token'] = token
                 self.write_json()
@@ -57,12 +50,10 @@ class UsersHandler(JsonHandler):
         uid = self._token_check()
         if uid:
             contact = self.json_data['contact']
-            # contact = self.db.query(CUsers).filter(CUsers.email == contact).one_or_none()
-            # new_contact = CContacts(user_id=uid, contact=contact.uid)
-            # self.db.add(new_contact)
-            # self.db.commit()
-            ServerStorage().add_contact_list(uid=uid,
-                                             contact=contact)  # Добавление в список конактов через work_with_db.py
+            contact = self.db.query(CUsers).filter(CUsers.email == contact).one_or_none()
+            new_contact = CContacts(user_id=uid, contact=contact.uid)
+            self.db.add(new_contact)
+            self.db.commit()
             self.response['contact_uid'] = contact.uid
             self.response['response'] = '201'
             self.write_json()
