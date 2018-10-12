@@ -50,10 +50,7 @@ class MainHandler(BaseHandler):
 def main():
     print('Start server')
     tornado.options.parse_command_line()
-    http_server = tornado.httpserver.HTTPServer(Application(), ssl_options={
-        "certfile": "/var/www/ca/fullchain.pem",
-        "keyfile": "/var/www/ca/privkey.pem",
-    })
+    http_server = tornado.httpserver.HTTPServer(Application())
     http_server.listen(options.port)
     tornado.ioloop.IOLoop.instance().start()
 
