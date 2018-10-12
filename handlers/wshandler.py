@@ -10,7 +10,7 @@ import os
 Пример для Windows: 
 LOG_PATCH = r'C:\\' 
 '''
-LOG_PATCH = '/var/log/pocket/'
+LOG_PATCH = './log'
 LOG_FILE_NAME = 'websocket.log'
 LOG_FULL_PATH = os.path.join(LOG_PATCH, LOG_FILE_NAME)
 
