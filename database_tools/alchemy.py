@@ -16,8 +16,19 @@ class CUsers(CBase):
     check_1 = UniqueConstraint('username')
     check_2 = UniqueConstraint('email')
 
+    status = Column(Integer(), ForeignKey('status_of_user.usid'))
+
     def __repr__(self):
         return 'CUsers: uid = %d, account_name = %s, email = %s' % (self.uid, self.username, self.email)
+
+class CUserStatus(CBase):
+    __tablename__ = 'status_of_user'
+
+    usid = Column(Integer(), primary_key=True)
+    statusname = Column(Unicode())
+
+    def __repr__(self):
+        return 'CUserStatus: usid = %d, status = %s' % (self.usid, self.statusname)
 
 
 class CMessages(CBase):
