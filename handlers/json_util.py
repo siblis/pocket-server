@@ -31,7 +31,7 @@ class JsonHandler(BaseHandler):
     def _token_expiration(self):
         today = datetime.now()
         days = timedelta(days=5)
-        token_expire = (today + days).timestamp()
+        token_expire = (today + days)
         return token_expire
 
     def _token_check(self):
@@ -45,7 +45,8 @@ class JsonHandler(BaseHandler):
                 if query_db.tokenexp is None:
                     self.set_status(401, reason='Your token expired')
                 else:
-                    if query_db.tokenexp < datetime.today():
+                    token_expiration_timestamp = query_db.tokenexp.timestamp()
+                    if token_expiration_timestamp < datetime.today().timestamp():
                         self.set_status(401, reason='Your token expired')
                     else:
                         return query_db

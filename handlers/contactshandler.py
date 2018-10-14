@@ -4,7 +4,7 @@ from database_tools.alchemy import CUsers, CContacts
 
 class ContactsHandler(JsonHandler):
     def prepare(self):
-        JsonHandler.prepare(self)
+        super().prepare()
         self.check_result = self._token_check()
 
     def post(self):
