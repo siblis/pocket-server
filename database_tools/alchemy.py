@@ -57,3 +57,21 @@ class CContacts(CBase):
 
     def __repr__(self):
         return 'CContacts<cid = %d, user_id = %d, contact = %d' % (self.cid, self.user_id, self.contact)
+    
+#------------------------------------------------
+class CGroups(CBase):
+        __tablename__ = 'groups'
+        gid = Column(Integer(), primary_key=True)
+        creation_time = Column(DateTime())
+        group_name = Column(Unicode())
+        creater_user_id = Column(Integer())
+        def __repr__(self):
+            return 'CGroups<gid = %d,  name = %d' % (self.gid, self.group_name)
+
+
+class CGroupsUsers(CBase):
+    __tablename__ = 'user_groups'
+
+    user_id = Column(Integer(), ForeignKey('users.uid'),primary_key=True)
+    group_id = Column(Integer(), ForeignKey('groups.gid'), primary_key=True)
+
