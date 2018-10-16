@@ -4,5 +4,6 @@
 /handlers/__pycache__
 /database_tools/__pycache__
 /database_tools/db_config.py
+/test_tools/.pytest_cache
 salt.py
 

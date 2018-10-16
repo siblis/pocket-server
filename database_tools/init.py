@@ -13,7 +13,8 @@ users = Table('users', meta,
               Column('username', String),
               Column('password', String),
               Column('email', String),
-              Column('token', String))
+              Column('token', String),
+              Column('tokenexp', DateTime))
 
 messages = Table('messages', meta,
                  Column('mid', Integer, primary_key=True),

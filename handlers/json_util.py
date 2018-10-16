@@ -3,6 +3,7 @@ import tornado.web
 from database_tools.alchemy import CUsers
 import hashlib
 from salt import salt
+from datetime import datetime, timedelta
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -27,21 +28,34 @@ class JsonHandler(BaseHandler):
         for elem in elem_set:
             self.write(str(elem) + "\n")
 
+    def _token_expiration(self):
+        today = datetime.now()
+        days = timedelta(days=5)
+        token_expire = (today + days)
+        return token_expire
+
     def _token_check(self):
         session = self.db
         token_db = None
         token = None
         if 'token' in self.request.headers:
             token = self.request.headers['token']
-            token_db = session.query(CUsers).filter(CUsers.token == token).one_or_none()
-            if token_db is not None and token == token_db.token:
-                return token_db.uid
+            query_db = session.query(CUsers).filter(CUsers.token == token).one_or_none()
+            if query_db is not None and token == query_db.token:
+                if query_db.tokenexp is None:
+                    self.set_status(401, reason='Your token expired')
+                else:
+                    token_expiration_timestamp = query_db.tokenexp.timestamp()
+                    if token_expiration_timestamp < datetime.today().timestamp():
+                        self.set_status(401, reason='Your token expired')
+                    else:
+                        return query_db
             else:
                 message = 'Token not found'
-                self.send_error(404, message=message)
+                self.set_status(404, reason=message)
         else:
             message = 'Unauthorized'
-            self.send_error(401, message=message)
+            self.set_status(401, reason=message)
 
 
 

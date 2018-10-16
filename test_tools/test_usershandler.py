@@ -5,6 +5,7 @@ from database_tools.db_connect import connect
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import Table, Column, Integer, String, MetaData
 from database_tools.alchemy import CUsers
+from datetime import datetime, timedelta
 
 
 class TestUsersHandler(AsyncHTTPTestCase):
@@ -23,15 +24,19 @@ class TestUsersHandler(AsyncHTTPTestCase):
                       Column('username', String),
                       Column('password', String),
                       Column('email', String),
-                      Column('token', String))
+                      Column('token', String),
+                      Column('tokenexp', String))
 
         meta.create_all(engine)
 
-        self.test_user = CUsers(username='test', password='test', email='testemail', token='token')
+        today = datetime.now()
+        new = timedelta(days=5)
+        expiration_time = (today + new).strftime("%Y-%m-%d %H:%M:%S")
+        self.test_user = CUsers(username='test', password='test', email='testemail', token='token', tokenexp=expiration_time)
         self.session.add(self.test_user)
         self.session.commit()
 
-        self.exists_user = CUsers(username='exists_user', password='test123', email='testemail123', token='token2')
+        self.exists_user = CUsers(username='exists_user', password='test123', email='testemail123', token='token2', tokenexp = '2004-10-19 10:23:54')
         self.session.add(self.exists_user)
         self.session.commit()
 

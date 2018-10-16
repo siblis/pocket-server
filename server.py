@@ -9,6 +9,7 @@ from handlers.authhandler import AuthHandler
 from handlers.usershandler import UsersHandler
 from handlers.usershandler import UsersHandlerId
 from handlers.chatshandler import ChatsHandler
+from handlers.contactshandler import ContactsHandler
 from handlers.wshandler import WebSocketHandler
 from handlers.wshandler_echo import WebSocketHandlerEcho
 from database_tools.db_connect import Session
@@ -26,6 +27,7 @@ class Application(tornado.web.Application):
             (r'/v1/auth/', AuthHandler),
             (r'/v1/users/', UsersHandler),
             (r'/v1/users/([0-9]+)', UsersHandlerId),
+            (r'/v1/users/contacts/', ContactsHandler),
             (r'/v1/ws/', WebSocketHandler),
             (r'/v1/ws_echo/', WebSocketHandlerEcho),
             (r'/v1/chats/', ChatsHandler),
@@ -36,7 +38,8 @@ class Application(tornado.web.Application):
         # login_url(декоратор для перенаправления на страницу авторизации не зарегистрированного пользователя
         settings = dict()
         # websocket_ping_interval=1 (для включения пинга) для отключение неактивных клиентов
-        tornado.web.Application.__init__(self, handlers, **settings)
+        tornado.web.Application.__init__(self, handlers, **settings, websocket_ping_interval=10,
+                                         websocket_ping_timeout=5 * 60)
 
         self.db = db
 

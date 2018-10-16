@@ -1,5 +1,6 @@
 from handlers.json_util import JsonHandler
 from database_tools.alchemy import CUsers
+from sqlalchemy import update
 import secrets
 
 
@@ -15,21 +16,16 @@ class AuthHandler(JsonHandler):
         if exists:
             result_db = self.db.query(CUsers.password).filter_by(username=login).first()[0]
             if passwd == result_db:
-                self.write('You logged success\n')
                 token = secrets.token_hex(8)
-                #  запись token
-                self.db.query(CUsers).filter(CUsers.username == login).update({CUsers.token: token},
-                                                                              synchronize_session='evaluate')
+                token_exp = self._token_expiration()
+                query = update(CUsers).where(CUsers.username == login).values(token=token, tokenexp=token_exp)
+                self.db.execute(query)
                 self.db.commit()
+                self.set_status(200)
                 self.response['token'] = token
-                self.response['response'] = '200'
                 self.write_json()
             else:
-                self.response['message'] = 'Incorrect password'
-                self.response['response'] = '403'
-                self.write_json()
+                self.set_status(403, 'Incorrect password')
 
         else:
-            self.response['message'] = 'Login or password incorrect'
-            self.response['response'] = '403'
-            self.write_json()
+            self.set_status(403, reason='Login or password incorrect')
