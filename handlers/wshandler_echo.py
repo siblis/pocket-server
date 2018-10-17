@@ -1,10 +1,10 @@
 import tornado.websocket
 import tornado.escape
 import logging
-from handlers.wshandler import UserData, WebSocketHandler
+from handlers.wshandler import WebSocketHandler
 
 
-class WebSocketHandlerEcho(WebSocketHandler, UserData):
+class WebSocketHandlerEcho(WebSocketHandler):
     def on_message(self, message):
         logging.info(f'Come message {message} from id {self.uid} and sessid {self.session}')
         json_data = ''
