@@ -75,3 +75,35 @@ class CGroupsUsers(CBase):
     user_id = Column(Integer(), ForeignKey('users.uid'),primary_key=True)
     group_id = Column(Integer(), ForeignKey('groups.gid'), primary_key=True)
 
+#-------------------------------------------------CUser_Status-------------------------------------------------------#
+class CUser_Status(CBase):
+    __tablename__ = 'user_status'
+
+    uid = Column(Integer(), ForeignKey('users.uid'), primary_key=True)
+    user_status = Column(Unicode())  # deleted, blocked, active, confirmation_registration
+
+    def __repr__(self):
+        return f'CUser_Status<uid = {self.uid}, user_status = {self.user_status}'
+
+def add_staus_user(session, uid):
+    msg = CUser_Status(uid=uid, user_status='confirmation_registration')
+    session.add(msg)
+    session.commit()
+
+
+def change_status_user_deleted(session, uid):
+    session.update(CUser_Status).where(uid=uid).values(user_status="deleted")
+    session.commit()
+
+
+def change_status_user_blocked(session, uid):
+    session.update(CUser_Status).where(uid=uid).values(user_status="blocked")
+    session.commit()
+
+
+def change_status_user_active(session, uid):
+    session.update(CUser_Status).where(uid=uid).values(user_status="active")
+    session.commit()
+
+def get_staus_user(session, uid):
+    return session.query(CUser_Status).filter_by(uid=uid).first()
