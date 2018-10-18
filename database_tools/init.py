@@ -44,4 +44,10 @@ user_roles = Table('user_roles', meta,
               Column('roleid', primary_key=True),
               Column('role_name'))
 
+
+#--------------------------------------------------------
+user_status = Table('user_status', meta,
+                 Column('uid', Integer, ForeignKey('users.uid'), primary_key=True),
+                 Column('user_status', String))
+
 meta.create_all(engine)
