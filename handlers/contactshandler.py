@@ -47,5 +47,6 @@ class ContactsHandler(JsonHandler):
             query = contacts.join(CUsers, CUsers.uid == CContacts.contact)
             records = query.all()
             for i in range(len(records)):
-                self.response[i] = records[i].CUsers.username
+                self.response[i] = {'id': records[i].CUsers.uid, 'name': records[i].CUsers.username,
+                                    'email': records[i].CUsers.email}
             self.write_json()
