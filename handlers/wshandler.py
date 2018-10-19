@@ -4,6 +4,7 @@ from handlers.json_util import JsonHandler
 from typing import NamedTuple
 import tornado.escape
 import logging
+from logging import handlers
 import os
 
 '''
@@ -18,13 +19,19 @@ LOG_FULL_PATH = os.path.join(LOG_PATCH, LOG_FILE_NAME)
 class UserData(NamedTuple):
     user_id: int
     user_name: str
+    user_email: str
     ws_object: 'WebSocketHandler'
 
 
 class WebSocketHandler(tornado.websocket.WebSocketHandler, JsonHandler):
     ws_dict = dict()
-    logging.basicConfig(format='%(asctime)s %(message)s', datefmt='[%d/%m/%Y %H:%M:%S]', filename=LOG_FULL_PATH,
-                        level=logging.INFO)
+    log_handler = logging.handlers.RotatingFileHandler(filename=LOG_FULL_PATH, maxBytes=900 * 1024, backupCount=3)
+    log_formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='[%d/%m/%Y %H:%M:%S]')
+
+    log_handler.setFormatter(log_formatter)
+    logger = logging.getLogger('WSLogger')
+    logger.setLevel(logging.INFO)
+    logger.addHandler(log_handler)
 
     def check_origin(self, origin):
         return True
@@ -40,19 +47,20 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler, JsonHandler):
             else:
                 self.uid = check_result.uid
                 self.username = check_result.username
+                self.usermail = check_result.email
         else:
-            logging.info('Token not found in headers')
-            logging.info(self.request.headers)
+            self.logger.info('Token not found in headers')
+            self.logger.info(self.request.headers)
             self.send_error(401)
 
     def open(self):
         self.session = self._gen_session()
-        logging.info(f'WebSocket opened, {self.session}')
-        self.user_tuple = UserData(self.uid, self.username, self)
+        self.logger.info(f'WebSocket opened, {self.session}')
+        self.user_tuple = UserData(self.uid, self.username, self.usermail, self)
         self.ws_dict[self.session] = self.user_tuple
 
     def on_message(self, message):
-        logging.info(f'Come message {message} from id {self.uid} and sessid {self.session}')
+        self.logger.info(f'Come message {message} from id {self.uid} and sessid {self.session}')
         json_data = ''
         try:
             json_data = tornado.escape.json_decode(message)
@@ -62,9 +70,9 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler, JsonHandler):
                 if key != self.session:
                     if self.ws_dict[key].user_id == int(json_data['receiver']):
                         self.ws_dict[key].ws_object.write_message(json_data)
-                        self.write_message({"response":"200"})
+                        self.write_message({"response": "200"})
                     else:
-                        #TODO сделать хранение не дошедших сообщений
+                        # TODO сделать хранение не дошедших сообщений
                         self.write_message({"response": "404", "message": "Client not found or not online"})
                 else:
                     if len(self.ws_dict) == 1:
@@ -77,8 +85,27 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler, JsonHandler):
             self.write_message({"response": "400", "message": message})
 
     def on_close(self):
-        logging.info(f'WebSocket closed, {self.session}')
+        self.logger.info(f'WebSocket closed, {self.session}')
         try:
             self.ws_dict.pop(self.session)
         except:
-            logging.info("No session in DICT")
+            self.logger.info("No session in DICT")
+
+
+class WebSocketStatusHandler(WebSocketHandler):
+    def get(self, user_id):
+        super().prepare()
+        self.response = dict()
+        if len(self.ws_dict.keys()) > 0:
+            for key in self.ws_dict.keys():
+                if self.ws_dict[key].user_id == int(user_id):
+                    self.response['user_id'] = self.ws_dict[key].user_id
+                    self.response['user_name'] = self.ws_dict[key].user_name
+                    self.response['user_email'] = self.ws_dict[key].user_email
+                    self.response['user_status'] = 'online'
+                    self.set_status(200)
+                    self.write_json()
+                else:
+                    self.set_status(404, 'User offline or not found')
+        else:
+            self.set_status(404, 'No users online')
