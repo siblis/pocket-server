@@ -11,9 +11,7 @@ class UsersHandler(JsonHandler):
             # self._get_elements(session, CUsers)
             # self._get_filtered(self.db, CUsers, uid)
             result = self.db.query(CUsers).filter(CUsers.uid == check_result.uid).one_or_none()
-            self.response['uid'] = result.uid
-            self.response['account_name'] = result.username
-            self.response['email'] = result.email
+            self.set_response(result)
             self.set_status(200)
             self.write_json()
 
@@ -72,8 +70,6 @@ class UsersHandlerId(UsersHandler):
             if result is None:
                 self.set_status(404, 'User not found')
             else:
-                self.response['uid'] = result.uid
-                self.response['account_name'] = result.username
-                self.response['email'] = result.email
+                self.set_response(result)
                 self.write_json()
                 self.set_status(200)

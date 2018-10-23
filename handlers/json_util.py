@@ -69,6 +69,11 @@ class JsonHandler(BaseHandler):
 
         self.response = dict()
 
+    def set_response(self, result):
+        self.response['uid'] = result.uid
+        self.response['account_name'] = result.username
+        self.response['email'] = result.email
+
     def set_default_headers(self):
         self.set_header('Content-Type', 'application/json')
 
