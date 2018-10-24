@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Unicode, UniqueConstraint, ForeignKey, MetaData
+from sqlalchemy import Column, Integer, Unicode, UniqueConstraint, ForeignKey, MetaData, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
