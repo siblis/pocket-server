@@ -1,8 +1,15 @@
 from handlers.json_util import JsonHandler
-from database_tools.alchemy import CGroups, Column, Integer
+from database_tools.alchemy import CGroups
 
 
 class GroupHandler(JsonHandler):
+    def get(self, *args):
+        check_result = self._token_check()
+        if check_result:
+            result = self.db.query(CGroups).filter(CGroups.gid == check_result.gid).one_or_none()
+            self.set_response(result)
+            self.set_status(200)
+            self.write_json()
 
     def post(self):
         try:
@@ -10,10 +17,6 @@ class GroupHandler(JsonHandler):
                 CGroups.username == self.json_data['group_name']).one_or_none()
 
             if result is None:
-                # gid = Column(Integer(), primary_key=True)
-                creation_time = Column(DateTime())
-                group_name = Column(Unicode())
-                creater_user_id = Column(Integer())
                 group_name = self.json_data['group_name']
                 creation_time = self.json_data['creation_time']
                 creater_user_id = self.json_data['creater_user_id']
