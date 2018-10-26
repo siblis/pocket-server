@@ -9,6 +9,12 @@ def get_status_id_users(session, status):
     return session.query(CUserStatus).filter_by(status_name=status).first()
 
 
+def add_status_users(session, status):
+    msg = CUserStatus(status_name=status)
+    session.add(msg)
+    session.commit()
+
+
 class StatusOfUsers(JsonHandler):
     """
     Класс для созданию, удалению, изменению статусов которые можно будет присовить пользователям
@@ -29,5 +35,28 @@ class StatusOfUsers(JsonHandler):
                     self.write_json()
                 else:
                     self.send_error(404, message='Status does not exists')
+        else:
+            self.send_error(400, message='Error token')
+
+    def post(self):
+        # Необходимо ограничить доступ к команде (сделать только для админов сервера)
+        check_result = self._token_check()
+        if check_result:
+            try:
+                status = self.json_data['status_name']
+            except:
+                self.send_error(400, message='Bad JSON')
+                return
+            if get_status_id_users(self.db, status) is None:
+                try:
+                    add_status_users(self.db, status)
+                except:
+                    self.send_error(500, message='Internal Server Error')
+                else:
+                    self.response['message'] = "Status created"
+                    self.set_status(200)
+                    self.write_json()
+            else:
+                self.send_error(409, message='Status already in list')
         else:
             self.send_error(400, message='Error token')
