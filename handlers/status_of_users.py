@@ -21,6 +21,12 @@ def change_status_name_users(session, old_status, new_status):
     session.commit()
 
 
+def delete_status_users(session, status):
+    msg = session.query(CUserStatus).filter_by(status_name=status).first()
+    session.delete(msg)
+    session.commit()
+
+
 class StatusOfUsers(JsonHandler):
     """
     Класс для созданию, удалению, изменению статусов которые можно будет присовить пользователям
@@ -92,5 +98,28 @@ class StatusOfUsers(JsonHandler):
                     self.send_error(409, message='New status already in list')
             else:
                 self.send_error(409, message='Old status does not exists')
+        else:
+            self.send_error(400, message='Error token')
+
+    def delete(self):
+        # Необходимо ограничить доступ к команде (сделать только для админов сервера)
+        check_result = self._token_check()
+        if check_result:
+            try:
+                status = self.json_data['status_name']
+            except:
+                self.send_error(400, message='Bad JSON')
+                return
+            if get_status_id_users(self.db, status) is not None:
+                try:
+                    delete_status_users(self.db, status)
+                except:
+                    self.send_error(500, message='Internal Server Error')
+                else:
+                    self.response['message'] = "Status delete"
+                    self.set_status(200)
+                    self.write_json()
+            else:
+                self.send_error(404, message='Status does not exists')
         else:
             self.send_error(400, message='Error token')
