@@ -1,6 +1,6 @@
 from sqlalchemy import update
 from handlers.json_util import JsonHandler
-from database_tools.alchemy import CUserStatus
+from database_tools.alchemy import CUserStatus, CUsers
 
 
 # запросы к БД
@@ -123,3 +123,9 @@ class StatusOfUsers(JsonHandler):
                 self.send_error(404, message='Status does not exists')
         else:
             self.send_error(400, message='Error token')
+
+
+class StatusOfUser(JsonHandler):
+    """
+    Класс для редактирвание статуса самого пользователя
+    """
