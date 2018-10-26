@@ -12,6 +12,7 @@ from handlers.chatshandler import ChatsHandler
 from handlers.contactshandler import ContactsHandler
 from handlers.wshandler import WebSocketHandler
 from handlers.wshandler_echo import WebSocketHandlerEcho
+from handlers.status_of_users import StatusOfUsers
 from database_tools.db_connect import Session
 
 define("port", default=8888, help="start on the given port", type=int)
@@ -28,6 +29,8 @@ class Application(tornado.web.Application):
             (r'/v1/users/', UsersHandler),
             (r'/v1/users/([0-9]+)', UsersHandlerId),
             (r'/v1/users/contacts/', ContactsHandler),
+            (r'/v1/users/status/', StatusOfUsers),
+            (r'/v1/users/status/([a-zA-Z]{1,}$)', StatusOfUsers),
             (r'/v1/ws/', WebSocketHandler),
             (r'/v1/ws_echo/', WebSocketHandlerEcho),
             (r'/v1/chats/', ChatsHandler),
