@@ -27,6 +27,12 @@ def delete_status_users(session, status):
     session.commit()
 
 
+# Запросы к редактированию статусов самих пользователей
+def get_status_name_user(session, status):
+    status_id = session.query(CUsers).filter_by(uid=status).first().status_id
+    return session.query(CUserStatus).filter_by(usid=status_id).first()
+
+
 class StatusOfUsers(JsonHandler):
     """
     Класс для созданию, удалению, изменению статусов которые можно будет присовить пользователям
@@ -129,3 +135,21 @@ class StatusOfUser(JsonHandler):
     """
     Класс для редактирвание статуса самого пользователя
     """
+
+    def get(self, status):
+        # print('status ', status)
+        check_result = self._token_check()
+        if check_result:
+            try:
+                result = get_status_name_user(self.db, status)
+            except:
+                self.send_error(500, message='Internal Server Error')
+            else:
+                if result is not None:
+                    self.response['users_status'] = result.usid
+                    self.set_status(200)
+                    self.write_json()
+                else:
+                    self.send_error(404, message='Error status get')
+        else:
+            self.send_error(400, message='Error token')
