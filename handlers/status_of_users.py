@@ -15,6 +15,12 @@ def add_status_users(session, status):
     session.commit()
 
 
+def change_status_name_users(session, old_status, new_status):
+    query = update(CUserStatus).where(CUserStatus.status_name == old_status).values(status_name=new_status)
+    session.execute(query)
+    session.commit()
+
+
 class StatusOfUsers(JsonHandler):
     """
     Класс для созданию, удалению, изменению статусов которые можно будет присовить пользователям
@@ -58,5 +64,33 @@ class StatusOfUsers(JsonHandler):
                     self.write_json()
             else:
                 self.send_error(409, message='Status already in list')
+        else:
+            self.send_error(400, message='Error token')
+
+    def put(self):
+        # Необходимо ограничить доступ к команде (сделать только для админов сервера)
+        check_result = self._token_check()
+        if check_result:
+            try:
+                old_status_name = self.json_data['old_status_name']
+                new_status_name = self.json_data['new_status_name']
+            except:
+                self.send_error(400, message='Bad JSON')
+                return
+            if get_status_id_users(self.db, old_status_name) is not None:
+                if get_status_id_users(self.db, new_status_name) is None:
+                    try:
+                        change_status_name_users(self.db, self.json_data['old_status_name'],
+                                                 self.json_data['new_status_name'])
+                    except:
+                        self.send_error(500, message='Internal Server Error')
+                    else:
+                        self.response['message'] = "Status change"
+                        self.set_status(200)
+                        self.write_json()
+                else:
+                    self.send_error(409, message='New status already in list')
+            else:
+                self.send_error(409, message='Old status does not exists')
         else:
             self.send_error(400, message='Error token')
