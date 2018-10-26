@@ -33,6 +33,13 @@ def get_status_name_user(session, status):
     return session.query(CUserStatus).filter_by(usid=status_id).first()
 
 
+def set_status_user(session, user_id, status_id):
+    # Необходимо заранее получить status_id
+    query = update(CUsers).where(CUsers.uid == user_id).values(status_id=status_id)
+    session.execute(query)
+    session.commit()
+
+
 class StatusOfUsers(JsonHandler):
     """
     Класс для созданию, удалению, изменению статусов которые можно будет присовить пользователям
@@ -151,5 +158,33 @@ class StatusOfUser(JsonHandler):
                     self.write_json()
                 else:
                     self.send_error(404, message='Error status get')
+        else:
+            self.send_error(400, message='Error token')
+
+    def put(self):
+        check_result = self._token_check()
+        if check_result:
+            try:
+                user_id = self.json_data['user_id']
+                status_name = self.json_data['status_name']
+            except:
+                self.send_error(400, message='Bad JSON')
+                return
+            try:
+                status_id_users = get_status_id_users(self.db, status_name)
+            except:
+                self.send_error(409, message='Error status set')
+                return
+            if status_id_users is not None:
+                try:
+                    set_status_user(self.db, user_id, status_id_users.usid)
+                except:
+                    self.send_error(500, message='Internal Server Error')
+                else:
+                    self.response['message'] = "Status change"
+                    self.set_status(200)
+                    self.write_json()
+            else:
+                self.send_error(409, message='Error status set')
         else:
             self.send_error(400, message='Error token')
