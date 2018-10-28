@@ -53,7 +53,7 @@ class UsersHandler(JsonHandler):
         check_result = self._token_check()
         if check_result:
             user_uid = self.json_data['uid']
-            user = self.db.query(CUsers).filter(CUsers.uid == user_uid).one_or_none() #first or default
+            user = self.db.query(CUsers).filter(CUsers.uid == user_uid).one_or_none()  # first or default
             if user is None:
                 self.set_status(404, 'User not found')
             else:
@@ -63,15 +63,17 @@ class UsersHandler(JsonHandler):
                 email = self.json_data['email']
                 token = secrets.token_hex(8)
                 token_expire = self._token_expiration()
-                user = CUsers(username=user, password=password, email=email, token=token, tokenexp=token_expire) #это мы создали, а как апдейтить?!
+                user = CUsers(username=user, password=password, email=email, token=token,
+                              tokenexp=token_expire)  # это мы создали, а как апдейтить?!
 
                 self.db.query(CUsers).filter(CUsers.uid == user_uid).update(
-                    {'username': user, 'password':password, 'email':email }
+                    {'username': user, 'password': password, 'email': email}
                 )
 
                 self.db.commit()
 
-                self.set_status(201, reason='Updated') #статус какой?
+                self.set_status(201, reason='Updated')  # статус какой?
+
 
                 self.response['token'] = token
                 self.write_json()
