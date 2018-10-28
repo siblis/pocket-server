@@ -6,6 +6,7 @@ import tornado.escape
 import logging
 from logging import handlers
 import os
+import datetime
 
 '''
 Пример для Windows: 
@@ -61,11 +62,12 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler, JsonHandler):
 
     def on_message(self, message):
         self.logger.info(f'Come message {message} from id {self.uid} and sessid {self.session}')
-        json_data = ''
+        json_data = dict()
         try:
             json_data = tornado.escape.json_decode(message)
             json_data['senderid'] = self.uid
             json_data['sender_name'] = self.username
+            json_data['timestamp'] = datetime.datetime.today().timestamp()
             for key in self.ws_dict.keys():
                 if key != self.session:
                     if self.ws_dict[key].user_id == int(json_data['receiver']):
