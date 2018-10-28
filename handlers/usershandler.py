@@ -48,7 +48,8 @@ class UsersHandler(JsonHandler):
         except Exception as e:
             self.send_error(400, message='Bad JSON, need account_name')
 
-    def put(self):
+      def put(self):
+
         check_result = self._token_check()
         if check_result:
             user_uid = self.json_data['uid']
@@ -72,6 +73,7 @@ class UsersHandler(JsonHandler):
                 self.db.commit()
 
                 self.set_status(201, reason='Updated')  # статус какой?
+
 
                 self.response['token'] = token
                 self.write_json()
