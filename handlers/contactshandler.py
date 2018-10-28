@@ -57,3 +57,15 @@ class ContactsHandler(JsonHandler):
                 self.response[records[i].CUsers.email] = {'id': records[i].CUsers.uid,
                                                           'name': records[i].CUsers.username}
             self.write_json()
+
+
+class ContactsByIdHandler(ContactsHandler):
+    def get(self):
+        super().prepare()
+        if self.check_result:
+            contacts = self.db.query(CContacts, CUsers).filter(CContacts.user_id == self.check_result.uid)
+            query = contacts.join(CUsers, CUsers.uid == CContacts.contact)
+            records = query.all()
+            for i in range(len(records)):
+                self.response[i] = {'id': records[i].CUsers.uid}
+            self.write_json()
