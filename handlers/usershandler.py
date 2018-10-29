@@ -49,17 +49,33 @@ class UsersHandler(JsonHandler):
             self.send_error(400, message='Bad JSON, need account_name')
 
     def put(self):
+
         check_result = self._token_check()
         if check_result:
-            contact = self.json_data['contact']
-            contact = self.db.query(CUsers).filter(CUsers.email == contact).one_or_none()
-            if contact is None:
-                self.set_status(404, 'Contact not found')
+            user_uid = self.json_data['uid']
+            user = self.db.query(CUsers).filter(CUsers.uid == user_uid).one_or_none()  # first or default
+            if user is None:
+                self.set_status(404, 'User not found')
             else:
-                new_contact = CContacts(user_id=check_result.uid, contact=contact.uid)
-                self.db.add(new_contact)
+                user = self.json_data['account_name']
+                password = self.json_data['password']
+                password = self._create_sha(password)
+                email = self.json_data['email']
+                token = secrets.token_hex(8)
+                token_expire = self._token_expiration()
+                user = CUsers(username=user, password=password, email=email, token=token,
+                              tokenexp=token_expire)  # это мы создали, а как апдейтить?!
+
+                self.db.query(CUsers).filter(CUsers.uid == user_uid).update(
+                    {'username': user, 'password': password, 'email': email}
+                )
+
                 self.db.commit()
-                self.set_status(201, 'Created')
+
+                self.set_status(201, reason='Updated')  # статус какой?
+
+                self.response['token'] = token
+                self.write_json()
 
 
 class UsersHandlerId(UsersHandler):

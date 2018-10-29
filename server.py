@@ -10,6 +10,7 @@ from handlers.usershandler import UsersHandler
 from handlers.usershandler import UsersHandlerId
 from handlers.chatshandler import ChatsHandler
 from handlers.contactshandler import ContactsHandler
+from handlers.contactshandler import ContactsByIdHandler
 from handlers.wshandler import WebSocketHandler
 from handlers.wshandler import WebSocketStatusHandler
 from handlers.wshandler_echo import WebSocketHandlerEcho
@@ -29,6 +30,7 @@ class Application(tornado.web.Application):
             (r'/v1/users/', UsersHandler),
             (r'/v1/users/([0-9]+)', UsersHandlerId),
             (r'/v1/users/contacts/', ContactsHandler),
+            (r'/v1/users/contacts_by_id/', ContactsByIdHandler),
             (r'/v1/ws/', WebSocketHandler),
             (r'/v1/ws/status/([0-9]+)', WebSocketStatusHandler),
             (r'/v1/ws_echo/', WebSocketHandlerEcho),
