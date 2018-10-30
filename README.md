@@ -11,7 +11,6 @@ Pocket Messenger Server Part
   python 3.6
     tornado
     sqlalchemy
-    salt
 
 Установка серверной части:
   Подготоваливаем сервер баз данных
@@ -57,10 +56,14 @@ Pocket Messenger Server Part
    Дальше нужно создать модели/структуры в БД, для этого копируем файл database_tools/db_config.py.template в 
    database_tools/db_config.py
    Редактируем файл - указываем параметры подключения к вашему серверу базданных.
+   Если HTTPS не используете, то необходимо в файле server.py, его то же отключить, строчка http_server должна
+   выглядить так:
    
+        http_server = tornado.httpserver.HTTPServer(Application())
+    
    Да, не забудьте установить необходимые библиотеки:
     
-    sudo pip3 install tornado, sqlalchemy, salt
+    sudo pip3 install tornado, sqlalchemy
     если pip3 не установлен его можено утановит так:
     sudo apt update
     sudo apt install python3-pip
