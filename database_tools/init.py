@@ -33,7 +33,7 @@ groups = Table('groups', meta,
               Column('uid', Integer, primary_key=True),
               Column('groupname', String),
               Column('creation_date', DateTime),
-              Column('creater_user_id'), Integer)
+              Column('creater_user_id', Integer))
 
 user_groups = Table('user_groups', meta,
               Column('userid', ForeignKey('users.uid')),
