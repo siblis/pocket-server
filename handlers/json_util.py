@@ -69,18 +69,21 @@ class JsonHandler(BaseHandler):
 
         self.response = dict()
 
+    def set_response(self, result):
+        self.response['uid'] = result.uid
+        self.response['account_name'] = result.username
+        self.response['email'] = result.email
+
     def set_default_headers(self):
         self.set_header('Content-Type', 'application/json')
 
     def write_error(self, status_code, **kwargs):
-        if 'message' not in kwargs:
-            if status_code == 405:
-                kwargs['message'] = 'Invalid HTTP method.'
-            else:
-                kwargs['message'] = 'Unknown error.'
-
-        self.response = kwargs
-        self.write_json()
+        if self.get_status() is None:
+            if 'message' not in kwargs:
+                if status_code == 405:
+                    kwargs['message'] = 'Invalid HTTP method.'
+                    self.response = kwargs
+                    self.write_json()
 
     def write_json(self):
         output = tornado.escape.json_encode(self.response)

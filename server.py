@@ -10,7 +10,9 @@ from handlers.usershandler import UsersHandler
 from handlers.usershandler import UsersHandlerId
 from handlers.chatshandler import ChatsHandler
 from handlers.contactshandler import ContactsHandler
+from handlers.contactshandler import ContactsByIdHandler
 from handlers.wshandler import WebSocketHandler
+from handlers.wshandler import WebSocketStatusHandler
 from handlers.wshandler_echo import WebSocketHandlerEcho
 from handlers.status_of_users import StatusOfUsers, StatusOfUser
 from database_tools.db_connect import Session
@@ -33,7 +35,9 @@ class Application(tornado.web.Application):
             (r'/v1/users/status/([a-zA-Z]{1,}$)', StatusOfUsers),
             (r'/v1/users/status/user/', StatusOfUser),
             (r'/v1/users/status/user/([0-9]+)', StatusOfUser),
+            (r'/v1/users/contacts_by_id/', ContactsByIdHandler),
             (r'/v1/ws/', WebSocketHandler),
+            (r'/v1/ws/status/([0-9]+)', WebSocketStatusHandler),
             (r'/v1/ws_echo/', WebSocketHandlerEcho),
             (r'/v1/chats/', ChatsHandler),
             (r'/v1/chats/add', ChatsHandler),

@@ -6,7 +6,7 @@ from handlers.wshandler import WebSocketHandler
 
 class WebSocketHandlerEcho(WebSocketHandler):
     def on_message(self, message):
-        logging.info(f'Come message {message} from id {self.uid} and sessid {self.session}')
+        self.logger.info(f'Come message {message} from id {self.uid} and sessid {self.session}')
         json_data = ''
         try:
             json_data = tornado.escape.json_decode(message)
