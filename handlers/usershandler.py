@@ -3,6 +3,12 @@ from database_tools.alchemy import CUsers, CContacts
 import secrets
 
 
+# запросы к БД
+# Запросы для получение данных пользователя через email
+def get_user_data_by_mail(session, user_mail):
+    return session.query(CUsers).filter(CUsers.email == user_mail).one_or_none()
+
+
 class UsersHandler(JsonHandler):
     def get(self, *args):
         check_result = self._token_check()
@@ -78,16 +84,21 @@ class UsersHandlerId(UsersHandler):
                 self.write_json()
                 self.set_status(200)
 
+
 class UsersHandlerMail(UsersHandler):
     def get(self, user_mail):
         check_result = self._token_check()
         if check_result:
-            result = self.db.query(CUsers).filter(CUsers.email == user_mail).one_or_none()
-            if result is None:
-                self.set_status(404, 'User not found')
+            try:
+                result = get_user_data_by_mail(self.db, user_mail)
+            except:
+                self.send_error(500, message='Internal Server Error')
             else:
-                self.response['uid'] = result.uid
-                self.response['account_name'] = result.username
-                self.response['email'] = result.email
-                self.write_json()
-                self.set_status(200)
+                if result is None:
+                    self.set_status(404, 'User not found')
+                else:
+                    self.response['uid'] = result.uid
+                    self.response['account_name'] = result.username
+                    self.response['email'] = result.email
+                    self.write_json()
+                    self.set_status(200)
