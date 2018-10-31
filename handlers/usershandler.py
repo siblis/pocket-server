@@ -21,6 +21,7 @@ class UsersHandler(JsonHandler):
             if len(result_email) > 0:
                 message = 'Conflict, mail exist'
                 self.send_error(409, message=message)
+                return
         except KeyError:
             self.send_error(400, message='Bad JSON, email need')
 
