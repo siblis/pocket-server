@@ -82,7 +82,7 @@ class UsersHandlerMail(UsersHandler):
     def get(self, user_mail):
         check_result = self._token_check()
         if check_result:
-            result = self.db.query(CUsers).filter(CUsers.uid == user_mail).one_or_none()
+            result = self.db.query(CUsers).filter(CUsers.email == user_mail).one_or_none()
             if result is None:
                 self.set_status(404, 'User not found')
             else:
