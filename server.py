@@ -7,7 +7,7 @@ from tornado.options import define, options
 from handlers.json_util import BaseHandler
 from handlers.authhandler import AuthHandler
 from handlers.usershandler import UsersHandler
-from handlers.usershandler import UsersHandlerId, UsersHandlerMail
+from handlers.usershandler import UsersHandlerId, UsersHandlerMail, UsersHandlerSearchByNickname
 from handlers.chatshandler import ChatsHandler
 from handlers.contactshandler import ContactsHandler
 from handlers.contactshandler import ContactsByIdHandler
@@ -31,6 +31,7 @@ class Application(tornado.web.Application):
             (r'/v1/auth/', AuthHandler),
             (r'/v1/users/', UsersHandler),
             (r'/v1/users/([0-9]+)', UsersHandlerId),
+            (r'/v1/users/([a-zA-Z][a-zA-Z0-9]{2,})', UsersHandlerSearchByNickname),
             (r'/v1/users/([a-z0-9!#$%&\'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)', UsersHandlerMail),
             (r'/v1/users/contacts/', ContactsHandler),
             (r'/v1/users/groups/', GroupHandler),
