@@ -7,13 +7,14 @@ from tornado.options import define, options
 from handlers.json_util import BaseHandler
 from handlers.authhandler import AuthHandler
 from handlers.usershandler import UsersHandler
-from handlers.usershandler import UsersHandlerId
+from handlers.usershandler import UsersHandlerId, UsersHandlerMail
 from handlers.chatshandler import ChatsHandler
 from handlers.contactshandler import ContactsHandler
 from handlers.contactshandler import ContactsByIdHandler
 from handlers.wshandler import WebSocketHandler
 from handlers.wshandler import WebSocketStatusHandler
 from handlers.wshandler_echo import WebSocketHandlerEcho
+from handlers.grouphandler import GroupHandler
 from handlers.status_of_users import StatusOfUsers, StatusOfUser
 from database_tools.db_connect import Session
 
@@ -30,7 +31,9 @@ class Application(tornado.web.Application):
             (r'/v1/auth/', AuthHandler),
             (r'/v1/users/', UsersHandler),
             (r'/v1/users/([0-9]+)', UsersHandlerId),
+            (r'/v1/users/([a-z0-9!#$%&\'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)', UsersHandlerMail),
             (r'/v1/users/contacts/', ContactsHandler),
+            (r'/v1/users/groups/', GroupHandler),
             (r'/v1/users/status/', StatusOfUsers),
             (r'/v1/users/status/([a-zA-Z]{1,}$)', StatusOfUsers),
             (r'/v1/users/status/user/', StatusOfUser),

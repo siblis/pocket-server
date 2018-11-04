@@ -14,7 +14,8 @@ users = Table('users', meta,
               Column('password', String),
               Column('email', String),
               Column('token', String),
-              Column('tokenexp', DateTime))
+              Column('tokenexp', DateTime),
+              Column('status_id', Integer))
 
 messages = Table('messages', meta,
                  Column('mid', Integer, primary_key=True),
@@ -43,5 +44,9 @@ user_groups = Table('user_groups', meta,
 user_roles = Table('user_roles', meta,
               Column('roleid', primary_key=True),
               Column('role_name'))
+
+status_of_user = Table('status_of_user', meta,
+                       Column('usid', Integer, primary_key=True),
+                       Column('status_name', String))
 
 meta.create_all(engine)
