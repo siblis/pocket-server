@@ -1,4 +1,3 @@
-import json
 from handlers.json_util import JsonHandler
 from database_tools.alchemy import CUsers, CContacts
 import secrets
