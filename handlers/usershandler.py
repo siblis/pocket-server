@@ -1,3 +1,4 @@
+import json
 from handlers.json_util import JsonHandler
 from database_tools.alchemy import CUsers, CContacts
 import secrets
@@ -7,6 +8,11 @@ import secrets
 # Запросы для получение данных пользователя через email
 def get_user_data_by_mail(session, user_mail):
     return session.query(CUsers).filter(CUsers.email == user_mail).one_or_none()
+
+
+def get_user_data_by_nickname(session, username):
+    return session.query(CUsers).filter(CUsers.username.like(f"%{username}%")).all()
+    # return session.query(CUsers).filter(CUsers.username == username).limit(20)
 
 
 class UsersHandler(JsonHandler):
@@ -55,9 +61,8 @@ class UsersHandler(JsonHandler):
         except Exception as e:
             self.send_error(400, message='Bad JSON, need account_name')
 
-   
     def put(self):
-       
+
         check_result = self._token_check()
         if check_result:
             try:
@@ -117,5 +122,27 @@ class UsersHandlerMail(UsersHandler):
                     self.response['uid'] = result.uid
                     self.response['account_name'] = result.username
                     self.response['email'] = result.email
+                    self.write_json()
+                    self.set_status(200)
+
+
+class UsersHandlerSearchByNickname(UsersHandler):
+    def get(self, username):
+        check_result = self._token_check()
+        if check_result:
+            try:
+                result = get_user_data_by_nickname(self.db, username)
+            except:
+                self.send_error(500, message='Internal Server Error')
+            else:
+                if result is None:
+                    self.set_status(404, 'User not found')
+                else:
+                    for user in result:
+                        json_mess = {
+                                    'account_name': user.username,
+                                    'email': user.email
+                        }
+                        self.response[user.uid] = json_mess
                     self.write_json()
                     self.set_status(200)
