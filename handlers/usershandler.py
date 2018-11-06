@@ -28,7 +28,7 @@ class UsersHandler(JsonHandler):
 
     def post(self):
         try:
-            result_email = self.db.query(CUsers.email).filter(CUsers.email == self.json_data['email']).all()
+            result_email = self.db.query(CUsers.email).filter(CUsers.email == str(self.json_data['email'])).all()
             if len(result_email) > 0:
                 message = 'Conflict, mail exist'
                 self.send_error(409, message=message)
