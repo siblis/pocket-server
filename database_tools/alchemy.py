@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, Unicode, UniqueConstraint, ForeignKey, MetaData, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
+import datetime
 
 CBase = declarative_base()
 
@@ -13,7 +14,7 @@ class CUsers(CBase):
     password = Column(Unicode())
     email = Column(Unicode())
     token = Column(Unicode())
-    tokenexp = Column(Unicode())
+    tokenexp = Column(DateTime())
     check_1 = UniqueConstraint('username')
     check_2 = UniqueConstraint('email')
     status_id = Column(Integer(), ForeignKey('status_of_user.usid'))
@@ -30,6 +31,16 @@ class CUserStatus(CBase):
 
     def __repr__(self):
         return 'CUserStatus: usid = %d, status = %s' % (self.usid, self.status_name)
+
+
+class CUserRoles(CBase):
+    __tablename__ = 'user_roles'
+
+    roleid = Column(Integer(), primary_key=True)
+    role_name = Column(Unicode())
+
+    def __repr__(self):
+        return 'CUserStatus: roleid = %d, role_name = %s' % (self.roleid, self.role_name)
 
 
 class CMessages(CBase):
@@ -62,7 +73,7 @@ class CContacts(CBase):
 class CGroups(CBase):
         __tablename__ = 'groups'
         gid = Column(Integer(), primary_key=True)
-        creation_time = Column(DateTime())
+        creation_time = Column(DateTime, default=datetime.datetime.utcnow())
         group_name = Column(Unicode())
         creater_user_id = Column(Integer())
         def __repr__(self):
