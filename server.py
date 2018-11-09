@@ -44,7 +44,9 @@ class Application(tornado.web.Application):
             (r'/v1/ws/status/([0-9]+)', WebSocketStatusHandler),
             (r'/v1/ws_echo/', WebSocketHandlerEcho),
             (r'/v1/chats/', ChatsHandler),
-            (r'/v1/chats/add', ChatsHandler),
+            (r'/v1/chats/([0-9]+)', ChatsHandler),
+            (r'/v1/chats/([a-zA-Z][a-zA-Z0-9]{2,})', ChatsHandler),
+            # (r'/v1/chats/add', ChatsHandler),
         ]
 
         # если понадобится cookie_secret(для подписания cookie),
