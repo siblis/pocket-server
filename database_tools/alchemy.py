@@ -85,4 +85,5 @@ class CGroupsUsers(CBase):
 
     user_id = Column(Integer(), ForeignKey('users.uid'),primary_key=True)
     group_id = Column(Integer(), ForeignKey('groups.gid'), primary_key=True)
-
+    def __repr__(self):
+        return f'CGroups<user_id = {user_id},  group_id = {group_id}'
