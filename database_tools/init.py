@@ -37,13 +37,13 @@ groups = Table('groups', meta,
               Column('creater_user_id', Integer))
 
 user_groups = Table('user_groups', meta,
-              Column('userid', ForeignKey('users.uid')),
-              Column('groupid', ForeignKey('groups.gid')))
+              Column('user_id', ForeignKey('users.uid')),
+              Column('group_id', ForeignKey('groups.gid')))
 
 #---------------------------------------------------roles
 user_roles = Table('user_roles', meta,
-              Column('roleid', primary_key=True),
-              Column('role_name'))
+              Column('roleid', Integer, primary_key=True),
+              Column('role_name', String))
 
 status_of_user = Table('status_of_user', meta,
                        Column('usid', Integer, primary_key=True),
