@@ -73,7 +73,7 @@ class CContacts(CBase):
 class CGroups(CBase):
         __tablename__ = 'groups'
         gid = Column(Integer(), primary_key=True)
-        creation_time = Column(DateTime, default=datetime.datetime.utcnow())
+        creation_date = Column(DateTime, default=datetime.datetime.utcnow())
         group_name = Column(Unicode())
         creater_user_id = Column(Integer())
         def __repr__(self):
