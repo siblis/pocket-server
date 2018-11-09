@@ -37,10 +37,17 @@ groups = Table('groups', meta,
               Column('creater_user_id', Integer))
 
 user_groups = Table('user_groups', meta,
-              Column('user_id', ForeignKey('users.uid')),
-              Column('group_id', ForeignKey('groups.gid')))
+                    Column('user_id', ForeignKey('users.uid')),
+                    Column('group_id', ForeignKey('groups.gid')))
 
-#---------------------------------------------------roles
+messages_chat = Table('messages_chat', meta,
+                      Column('mid', Integer, primary_key=True),
+                      Column('group_id', Integer, ForeignKey('groups.gid')),
+                      Column('to_id', Integer, ForeignKey('users.uid')),
+                      Column('from_id', Integer, ForeignKey('users.uid')),
+                      Column('message', String),
+                      Column('dtime', DateTime))
+# ---------------------------------------------------roles
 user_roles = Table('user_roles', meta,
               Column('roleid', Integer, primary_key=True),
               Column('role_name', String))
