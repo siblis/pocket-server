@@ -87,3 +87,21 @@ class CGroupsUsers(CBase):
     group_id = Column(Integer(), ForeignKey('groups.gid'), primary_key=True)
     def __repr__(self):
         return f'CGroups<user_id = {user_id},  group_id = {group_id}'
+
+
+class CMessagesChat(CBase):
+    __tablename__ = 'messages_chat'
+
+    mid = Column(Integer(), primary_key=True)
+    message = Column(Unicode())
+    group_id = Column(Integer(), ForeignKey('groups.gid'))
+    from_id = Column(Integer(), ForeignKey('users.uid'))
+    to_id = Column(Integer(), ForeignKey('users.uid'))
+    dtime = Column(DateTime())
+
+    p_group_id = relationship('CGroups', foreign_keys=[group_id])
+    p_from_id = relationship('CUsers', foreign_keys=[from_id])
+    p_to_id = relationship('CUsers', foreign_keys=[to_id])
+
+    def __repr__(self):
+        return f'CMessages<mid = {self.mid}, group_id={self.group_id}, from_id = {self.from_id}, to_id = {self.to_id}, message = {self.message}, dtime = {self.dtime}'
