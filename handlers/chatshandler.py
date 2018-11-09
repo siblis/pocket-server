@@ -94,19 +94,21 @@ class ChatsHandler(JsonHandler):
                 except:
                     self.send_error(500, message='Internal Server Error')
                     return
-
-            self.response['gid'] = result_group.gid
-            self.response['group_name'] = result_group.groupname
-            self.response['users'] = []
-            try:
-                result_users_group = group_users_get_in_id(self.db, result_group.gid)
-            except:
-                self.send_error(500, message='Internal Server Error')
-                return
-            for user in result_users_group:
-                self.response['users'].append(user.user_id)
-            self.set_status(200)
-            self.write_json()
+            if result_group is not None:
+                self.response['gid'] = result_group.gid
+                self.response['group_name'] = result_group.groupname
+                self.response['users'] = []
+                try:
+                    result_users_group = group_users_get_in_id(self.db, result_group.gid)
+                except:
+                    self.send_error(500, message='Internal Server Error')
+                    return
+                for user in result_users_group:
+                    self.response['users'].append(user.user_id)
+                self.set_status(200)
+                self.write_json()
+            else:
+                self.send_error(404, message='Group not found')
         else:
             self.send_error(400, message='Error token')
 
