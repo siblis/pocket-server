@@ -77,7 +77,7 @@ class CGroups(CBase):
         groupname = Column(Unicode())
         creater_user_id = Column(Integer())
         def __repr__(self):
-            return 'CGroups<gid = %d,  name = %d' % (self.gid, self.group_name)
+            return 'CGroups<gid = %d, name = %d' % (self.gid, self.group_name)
 
 
 class CGroupsUsers(CBase):
@@ -86,7 +86,7 @@ class CGroupsUsers(CBase):
     user_id = Column(Integer(), ForeignKey('users.uid'),primary_key=True)
     group_id = Column(Integer(), ForeignKey('groups.gid'), primary_key=True)
     def __repr__(self):
-        return f'CGroups<user_id = {user_id},  group_id = {group_id}'
+        return f'CGroupsUsers<user_id = {self.user_id}, group_id = {self.group_id}'
 
 
 class CMessagesChat(CBase):
