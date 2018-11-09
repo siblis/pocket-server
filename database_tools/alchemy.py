@@ -74,7 +74,7 @@ class CGroups(CBase):
         __tablename__ = 'groups'
         gid = Column(Integer(), primary_key=True)
         creation_date = Column(DateTime, default=datetime.datetime.utcnow())
-        group_name = Column(Unicode())
+        groupname = Column(Unicode())
         creater_user_id = Column(Integer())
         def __repr__(self):
             return 'CGroups<gid = %d,  name = %d' % (self.gid, self.group_name)
