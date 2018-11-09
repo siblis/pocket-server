@@ -37,8 +37,8 @@ groups = Table('groups', meta,
               Column('creater_user_id', Integer))
 
 user_groups = Table('user_groups', meta,
-                    Column('user_id', ForeignKey('users.uid')),
-                    Column('group_id', ForeignKey('groups.gid')))
+                    Column('user_id', ForeignKey('users.uid'), primary_key=True),
+                    Column('group_id', ForeignKey('groups.gid'), primary_key=True))
 
 messages_chat = Table('messages_chat', meta,
                       Column('mid', Integer, primary_key=True),
