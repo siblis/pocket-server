@@ -9,6 +9,7 @@ from handlers.authhandler import AuthHandler
 from handlers.usershandler import UsersHandler
 from handlers.usershandler import UsersHandlerId, UsersHandlerMail, UsersHandlerSearchByNickname
 from handlers.chatshandler import ChatsHandler
+from handlers.chatsmessageshandler import ChatsMessagesHandler
 from handlers.contactshandler import ContactsHandler
 from handlers.contactshandler import ContactsByIdHandler
 from handlers.wshandler import WebSocketHandler
@@ -46,6 +47,7 @@ class Application(tornado.web.Application):
             (r'/v1/chats/', ChatsHandler),
             (r'/v1/chats/([0-9]+)', ChatsHandler),
             (r'/v1/chats/([a-zA-Z][a-zA-Z0-9]{2,})', ChatsHandler),
+            (r'/v1/chats/messages/', ChatsMessagesHandler),
             # (r'/v1/chats/add', ChatsHandler),
         ]
 
