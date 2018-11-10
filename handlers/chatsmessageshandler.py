@@ -1,10 +1,14 @@
 from handlers.json_util import JsonHandler
 from database_tools.db_connect import Session
 from database_tools.alchemy import CGroups, CGroupsUsers, CMessagesChat
+# from sqlalchemy import or_
 from handlers.chatshandler import group_get_in_name as group_get_in_name
-from datetime import datetime
+from datetime import datetime, timedelta
 
 session = Session()
+
+TIME_DELTA = 30
+
 
 def add_message_in_group(session, group_id, from_id, to_id, message):
     creation_date = datetime.now()
@@ -12,14 +16,36 @@ def add_message_in_group(session, group_id, from_id, to_id, message):
     session.add(msg)
     session.commit()
 
+
 def get_group_in_users_id(session, group_id, user_id):
     return session.query(CGroupsUsers).filter_by(group_id=group_id, user_id=user_id).first()
 
+
+def get_messages_in_group(session, group_id, start_dtime, end_dtime):
+    return session.query(CMessagesChat).filter(CMessagesChat.group_id == group_id,
+                                               CMessagesChat.dtime >= start_dtime,
+                                               CMessagesChat.dtime <= end_dtime).all()
+
+
 class ChatsMessagesHandler(JsonHandler):
-    def get(self, group_mess_get_name_or_id):
+    # def get(self, url):
+    def get(self, url):
+        # id-user=[0-9]{1,}&data=[0-9]{2}-[0-9]{2}-[0-9]{4}&time=[0-9]{2}:[0-9]{2}:[0-9]{2}
         # получение последнии сообщения из групыы(чата)
         if self._token_check():
-            pass
+            values = url.split('&')
+            print(values)
+            result = {}
+            for value in values:
+                key, itam = value.split('=')
+                result[key] = itam
+            group_id = int(result['gruop-id'])
+            # user_id = int(result['user-id'])
+            user_id = self._token_check().uid
+            # Проверить входет ли пользователь в группу
+            start_dtime = datetime.strptime(f"{result['data']} {result['time']}", '%Y-%m-%d %H:%M:%S')
+            end_dtime = start_dtime + timedelta(minutes=TIME_DELTA)
+            print(get_messages_in_group(self.db, group_id=group_id, start_dtime=start_dtime, end_dtime=end_dtime))
 
     def post(self):
         # создание сообщений для группы(чата)
@@ -62,7 +88,8 @@ class ChatsMessagesHandler(JsonHandler):
                 # Все проверики прошли успешно
                 # Добовляем сообщение в группу
                 try:
-                    add_message_in_group(self.db, group_id=result_group.gid, from_id=from_id, to_id=to_id, message=message)
+                    add_message_in_group(self.db, group_id=result_group.gid, from_id=from_id, to_id=to_id,
+                                         message=message)
                 except:
                     self.send_error(500, message='Internal Server Error')
                     return
