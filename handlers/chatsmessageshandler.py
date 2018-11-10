@@ -6,9 +6,9 @@ from datetime import datetime
 
 session = Session()
 
-def add_message_in_group(session, group_id, from_id, to_id, message)
+def add_message_in_group(session, group_id, from_id, to_id, message):
     creation_date = datetime.now()
-    msg = CMessagesChat(id_group=group_id, from_id=from_id, to_id=to_id, dtime=creation_date, message=message)
+    msg = CMessagesChat(group_id=group_id, from_id=from_id, to_id=to_id, dtime=creation_date, message=message)
     session.add(msg)
     session.commit()
 
@@ -17,7 +17,7 @@ def get_group_in_users_id(session, group_id, user_id):
 
 class ChatsMessagesHandler(JsonHandler):
     def get(self, group_mess_get_name_or_id):
-        # получение сообщений из группы(чата)
+        # получение последнии сообщения из групыы(чата)
         if self._token_check():
             pass
 
@@ -66,8 +66,9 @@ class ChatsMessagesHandler(JsonHandler):
                 except:
                     self.send_error(500, message='Internal Server Error')
                     return
-                else:
-                    self.send_error(404, message='Only admin groups can add users to chat')
+                self.response['message'] = "Messages add group"
+                self.set_status(200)
+                self.write_json()
             else:
                 self.send_error(404, message='Group not found')
         else:
