@@ -31,7 +31,7 @@ def get_messages_in_group(session, group_id, start_dtime, end_dtime):
 class ChatsMessagesHandler(JsonHandler):
     # def get(self, url):
     def get(self, url):
-        # id-user=[0-9]{1,}&data=[0-9]{2}-[0-9]{2}-[0-9]{4}&time=[0-9]{2}:[0-9]{2}:[0-9]{2}
+        # gruop_id=[0-9]{1,}&data=[0-9]{2}-[0-9]{2}-[0-9]{4}&time=[0-9]{2}:[0-9]{2}:[0-9]{2}
         # получение последнии сообщения из групыы(чата)
         if self._token_check():
             try:
