@@ -1,5 +1,5 @@
 from handlers.json_util import JsonHandler
-from database_tools.alchemy import CUsers, CContacts
+from database_tools.alchemy import CUsers, CContacts, CUserStatus
 import secrets
 
 
@@ -47,7 +47,10 @@ class UsersHandler(JsonHandler):
                 email = self.json_data['email']
                 token = secrets.token_hex(8)
                 token_expire = self._token_expiration()
-                user = CUsers(username=user, password=password, email=email, token=token, tokenexp=token_expire)
+                """!!!!!!!!"""
+                status = self.db.query(CUserStatus).filter(CUserStatus.status_name == 'not confirm')
+                user = CUsers(username=user, password=password, email=email, token=token,
+                              tokenexp=token_expire, status_id=status.usid)
                 self.db.add(user)
                 self.db.commit()
                 self.set_status(201, reason='Created')
@@ -67,6 +70,8 @@ class UsersHandler(JsonHandler):
             try:
                 user_uid = self.json_data['uid']
                 user = self.db.query(CUsers).filter(CUsers.uid == user_uid).one_or_none()  # first or default
+                """!!!!!!!!"""
+                status_id = user.status_id  ##############
                 if user is None:
                     self.set_status(404, 'User not found')
                 else:
@@ -76,8 +81,9 @@ class UsersHandler(JsonHandler):
                     email = self.json_data['email']
                     token = secrets.token_hex(8)
                     token_expire = self._token_expiration()
+                    """!!!!!!!!"""
                     user = CUsers(username=user, password=password, email=email, token=token,
-                                  tokenexp=token_expire)  # это мы создали, а как апдейтить?!
+                                  tokenexp=token_expire, status_id=status_id)  # это мы создали, а как апдейтить?!
 
                     self.db.query(CUsers).filter(CUsers.uid == user_uid).update(
                         {'username': user, 'password': password, 'email': email}, synchronize_session='evaluate'
