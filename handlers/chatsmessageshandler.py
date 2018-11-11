@@ -3,6 +3,7 @@ from database_tools.db_connect import Session
 from database_tools.alchemy import CGroups, CGroupsUsers, CMessagesChat
 # from sqlalchemy import or_
 from handlers.chatshandler import group_get_in_name as group_get_in_name
+from handlers.chatshandler import group_get_in_id as group_get_in_id
 from datetime import datetime, timedelta
 
 session = Session()
@@ -33,19 +34,58 @@ class ChatsMessagesHandler(JsonHandler):
         # id-user=[0-9]{1,}&data=[0-9]{2}-[0-9]{2}-[0-9]{4}&time=[0-9]{2}:[0-9]{2}:[0-9]{2}
         # получение последнии сообщения из групыы(чата)
         if self._token_check():
-            values = url.split('&')
-            print(values)
-            result = {}
-            for value in values:
-                key, itam = value.split('=')
-                result[key] = itam
-            group_id = int(result['gruop-id'])
-            # user_id = int(result['user-id'])
+            try:
+                values = url.split('&')
+                result = {}
+                for value in values:
+                    key, itam = value.split('=')
+                    result[key] = itam
+                group_id = int(result['gruop-id'])
+                start_dtime = datetime.strptime(f"{result['data']} {result['time']}", '%Y-%m-%d %H:%M:%S')
+            except:
+                self.send_error(404, message='Bad Data')
+                return
             user_id = self._token_check().uid
-            # Проверить входет ли пользователь в группу
-            start_dtime = datetime.strptime(f"{result['data']} {result['time']}", '%Y-%m-%d %H:%M:%S')
             end_dtime = start_dtime + timedelta(minutes=TIME_DELTA)
-            print(get_messages_in_group(self.db, group_id=group_id, start_dtime=start_dtime, end_dtime=end_dtime))
+            # Проверка существоет ли группы
+            try:
+                group_exists = group_get_in_id(self.db, group_id)
+            except:
+                self.send_error(500, message='Internal Server Error')
+                return
+            if group_exists is None:
+                self.send_error(404, message='Group not found')
+                return
+            # Проверка входет ли пользователь в группу
+            try:
+                user_in_group = get_group_in_users_id(self.db,  group_id=group_id, user_id=user_id)
+            except:
+                self.send_error(500, message='Internal Server Error')
+                return
+            if user_in_group is None:
+                self.send_error(404, message='User not found in group')
+                return
+            # Получение сообщений пользователей
+            try:
+                result = get_messages_in_group(self.db, group_id=group_id, start_dtime=start_dtime, end_dtime=end_dtime)
+            except:
+                self.send_error(500, message='Internal Server Error')
+                return
+            if result is not None:
+                mess = {}
+                for messages in result:
+                    self.response[messages.mid] = {
+                        "from_id":messages.from_id,
+                        "to_id":messages.to_id,
+                        "message":messages.message,
+                        "datetime":messages.dtime.strftime("%Y-%m-%d %H:%M:%S")
+                    }
+                self.set_status(200)
+                self.write_json()
+            else:
+                self.send_error(401, message='Messages not found')
+        else:
+            self.send_error(400, message='Error token')
 
     def post(self):
         # создание сообщений для группы(чата)
