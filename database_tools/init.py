@@ -15,7 +15,7 @@ users = Table('users', meta,
               Column('email', String),
               Column('token', String),
               Column('tokenexp', DateTime),
-              Column('status_id', Integer))
+              Column('status_id', Integer, ForeignKey('status_of_user.usid')))
 
 messages = Table('messages', meta,
                  Column('mid', Integer, primary_key=True),
@@ -31,14 +31,16 @@ contacts = Table('contacts', meta,
 
 #-------------------------------------------------------------------
 groups = Table('groups', meta,
-              Column('gid', Integer, primary_key=True),
-              Column('groupname', String),
-              Column('creation_date', DateTime),
-              Column('creater_user_id', Integer))
+                Column('gid', Integer, primary_key=True),
+                Column('groupname', String),
+                Column('creation_date', DateTime),
+                Column('creater_user_id', Integer),
+                Column('category_group', Integer, ForeignKey('category_group.category_id')))
+
 
 user_groups = Table('user_groups', meta,
-              Column('userid', ForeignKey('users.uid')),
-              Column('groupid', ForeignKey('groups.gid')))
+                    Column('user_id', Integer, ForeignKey('users.uid'), primary_key=True),
+                    Column('group_id', Integer, ForeignKey('groups.gid'), primary_key=True))
 
 #---------------------------------------------------roles
 user_roles = Table('user_roles', meta,
@@ -48,5 +50,15 @@ user_roles = Table('user_roles', meta,
 status_of_user = Table('status_of_user', meta,
                        Column('usid', Integer, primary_key=True),
                        Column('status_name', String))
+
+############
+coll_group = Table('coll_group', meta,
+                   Column('collgroup_id', Integer, ForeignKey('groups.gid'), primary_key=True),
+                   Column('group_id', Integer, ForeignKey('groups.gid'), primary_key=True))
+
+############
+category_group = Table('category_group', meta,
+                       Column('category_id', Integer, primary_key=True),
+                       Column('category_name', String))
 
 meta.create_all(engine)
