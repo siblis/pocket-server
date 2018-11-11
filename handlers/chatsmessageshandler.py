@@ -58,7 +58,7 @@ class ChatsMessagesHandler(JsonHandler):
                 return
             # Проверка входет ли пользователь в группу
             try:
-                user_in_group = get_group_in_users_id(self.db,  group_id=group_id, user_id=user_id)
+                user_in_group = get_group_in_users_id(self.db, group_id=group_id, user_id=user_id)
             except:
                 self.send_error(500, message='Internal Server Error')
                 return
@@ -75,10 +75,10 @@ class ChatsMessagesHandler(JsonHandler):
                 mess = {}
                 for messages in result:
                     self.response[messages.mid] = {
-                        "from_id":messages.from_id,
-                        "to_id":messages.to_id,
-                        "message":messages.message,
-                        "datetime":messages.dtime.strftime("%Y-%m-%d %H:%M:%S")
+                        "from_id": messages.from_id,
+                        "to_id": messages.to_id,
+                        "message": messages.message,
+                        "datetime": messages.dtime.strftime("%Y-%m-%d %H:%M:%S")
                     }
                 self.set_status(200)
                 self.write_json()
