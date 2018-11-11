@@ -83,6 +83,6 @@ class CGroups(CBase):
 class CGroupsUsers(CBase):
     __tablename__ = 'user_groups'
 
-    user_id = Column(Integer(), ForeignKey('users.uid'),primary_key=True)
+    user_id = Column(Integer(), ForeignKey('users.uid'), primary_key=True)
     group_id = Column(Integer(), ForeignKey('groups.gid'), primary_key=True)
 
