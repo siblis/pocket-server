@@ -18,7 +18,7 @@ class AuthHandler(JsonHandler):
             if passwd == result_db:
                 token = secrets.token_hex(8)
                 token_exp = self._token_expiration()
-                status = self.db.query(CUserStatus).filter(CUserStatus.status_name == 'online')
+                status = self.db.query(CUserStatus).filter(CUserStatus.status_name == 'online').all()
                 query = update(CUsers).where(CUsers.username == login).values(token=token,
                                                                               tokenexp=token_exp,
                                                                               status_id=status.usid)

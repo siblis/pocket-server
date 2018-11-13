@@ -31,7 +31,7 @@ class GroupHandler(JsonHandler):
                 creation_date = self.json_data['creation_time']
                 creater_user_id = self.json_data['creater_user_id']
                 category_group = self.db.query(CCategoryGroup).filter(
-                    CCategoryGroup.category_name == self.json_data['category_group'])
+                    CCategoryGroup.category_name == self.json_data['category_group']).all()
                 group = CGroups(group_name=group_name, creation_date=creation_date,
                                 creater_user_id=creater_user_id, category_group=category_group.category_id)
                 self.db.add(group)
@@ -50,8 +50,8 @@ class GroupHandler(JsonHandler):
             add_group = None
             try:
                 check_group = self.db.query(CGroups.group_name).filter(
-                    CGroups.group_name == self.json_data['group_name'])
-                add_group = self.db.query(CGroups).filter(CGroups.group_name == self.json_data['add_group'])
+                    CGroups.group_name == self.json_data['group_name']).all()
+                add_group = self.db.query(CGroups).filter(CGroups.group_name == self.json_data['add_group']).all()
             except:
                 self.send_error(400, message='Please check group_name')
 
@@ -63,8 +63,8 @@ class GroupHandler(JsonHandler):
                 message = 'Add group not found'
                 self.send_error(409, message=message)
             else:
-                group = self.db.query(CGroups).filter(CGroups.group_name == self.json_data['group_name'])
-                add_group = self.db.query(CGroups).filter(CGroups.group_name == self.json_data['add_group'])
+                group = self.db.query(CGroups).filter(CGroups.group_name == self.json_data['group_name']).all()
+                add_group = self.db.query(CGroups).filter(CGroups.group_name == self.json_data['add_group']).all()
                 coll_group = CCollGroup(collgroup_id=group.gid, group_id=add_group.gid)
                 self.db.add(coll_group)
                 self.db.commit()
@@ -78,7 +78,7 @@ class GroupHandler(JsonHandler):
             """ Только создатель группы может её удалить """
             check_id = self.json_data['uid']
 
-            created_user = self.db.query(CGroups).filter(CGroups.group_name == group_name)
+            created_user = self.db.query(CGroups).filter(CGroups.group_name == group_name).all()
             if check_id == created_user.creater_user_id:
 
                 result = self.db.query(CGroups).filter(CGroups.group_name == group_name).one_or_none()
