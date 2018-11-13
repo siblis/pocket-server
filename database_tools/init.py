@@ -1,6 +1,8 @@
 from sqlalchemy import Table, Column, Integer, String, ForeignKey, MetaData, DateTime
 from sqlalchemy import create_engine
 from database_tools.db_connect import POSTGRES_SERVER, POSTGRES_PORT, POSTGRES_LOGIN, POSTGRES_PASS, POSTGRES_BASE
+from database_tools.category_group import add_category
+from database_tools.status import add_status
 
 engine = create_engine(
     'postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(POSTGRES_LOGIN, POSTGRES_PASS, POSTGRES_SERVER,
@@ -51,14 +53,17 @@ status_of_user = Table('status_of_user', meta,
                        Column('usid', Integer, primary_key=True),
                        Column('status_name', String))
 
-############
+
 coll_group = Table('coll_group', meta,
                    Column('collgroup_id', Integer, ForeignKey('groups.gid'), primary_key=True),
                    Column('group_id', Integer, ForeignKey('groups.gid')))
 
-############
+
 category_group = Table('category_group', meta,
                        Column('category_id', Integer, primary_key=True),
                        Column('category_name', String))
 
 meta.create_all(engine)
+
+add_status(engine)
+add_category(engine)
