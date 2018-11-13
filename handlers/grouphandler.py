@@ -50,10 +50,10 @@ class GroupHandler(JsonHandler):
             add_group = None
             try:
                 check_group = self.db.query(CGroups.group_name).filter(
-                    CGroups.group_name == self.json_data['group_name']).all()
-                add_group = self.db.query(CGroups).filter(CGroups.group_name == self.json_data['add_group']).first()
+                    CGroups.group_name == self.json_data['group_name']).one()
+                add_group = self.db.query(CGroups).filter(CGroups.group_name == self.json_data['add_group']).one()
             except:
-                self.send_error(400, message='Please check group_name')
+                self.send_error(400, message='Please check group names')
 
             if check_group is None:
                 message = 'Group not found'
