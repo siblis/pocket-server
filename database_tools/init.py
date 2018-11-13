@@ -34,7 +34,7 @@ contacts = Table('contacts', meta,
 #-------------------------------------------------------------------
 groups = Table('groups', meta,
                 Column('gid', Integer, primary_key=True),
-                Column('groupname', String),
+                Column('group_name', String),
                 Column('creation_date', DateTime),
                 Column('creater_user_id', Integer),
                 Column('category_group', Integer, ForeignKey('category_group.category_id')))
