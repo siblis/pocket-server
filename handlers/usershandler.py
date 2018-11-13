@@ -47,7 +47,7 @@ class UsersHandler(JsonHandler):
                 email = self.json_data['email']
                 token = secrets.token_hex(8)
                 token_expire = self._token_expiration()
-                status = self.db.query(CUserStatus).filter(CUserStatus.status_name == 'not confirm').all()
+                status = self.db.query(CUserStatus).filter(CUserStatus.status_name == 'not confirm').first()
                 user = CUsers(username=user, password=password, email=email, token=token,
                               tokenexp=token_expire, status_id=status.usid)
                 self.db.add(user)
