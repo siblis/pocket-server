@@ -84,23 +84,25 @@ class CGroups(CBase):
 
 class CGroupsUsers(CBase):
     __tablename__ = 'user_groups'
-
     user_id = Column(Integer(), ForeignKey('users.uid'), primary_key=True)
-    group_id = Column(Integer(), ForeignKey('groups.gid'), primary_key=True)
+    group_id = Column(Integer(), ForeignKey('groups.gid'))
+
+    def __repr__(self):
+        return 'CGroupsUsers<user_id = {}, group_id = {}'.format(self.user_id, self.group_id)
 
 
-class CCollGroup(CBase):        ############
+class CCollGroup(CBase):
     """ Коллекция групп ("группы в группе")"""
     __tablename__ = 'coll_group'
     collgroup_id = Column(Integer(), ForeignKey('groups.gid'), primary_key=True)
-    group_id = Column(Integer(), ForeignKey('groups.gid'), primary_key=True)
+    group_id = Column(Integer(), ForeignKey('groups.gid'))
 
     def __repr__(self):
         return 'CCollGroup<collgroup_id = {}, group_id = {}'.format(self.collgroup_id, self.group_id)
 
 
-class CCategoryGroup(CBase):        ############
-    """ Категории групп(обычная или мультигруппа """
+class CCategoryGroup(CBase):
+    """ Категории групп(обычная или мультигруппа) """
     __tablename__ = 'category_group'
     category_id = Column(Integer(), primary_key=True)
     category_name = Column(Unicode())
