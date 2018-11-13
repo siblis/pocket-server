@@ -47,7 +47,6 @@ class UsersHandler(JsonHandler):
                 email = self.json_data['email']
                 token = secrets.token_hex(8)
                 token_expire = self._token_expiration()
-                """!!!!!!!!"""
                 status = self.db.query(CUserStatus).filter(CUserStatus.status_name == 'not confirm')
                 user = CUsers(username=user, password=password, email=email, token=token,
                               tokenexp=token_expire, status_id=status.usid)
@@ -73,15 +72,14 @@ class UsersHandler(JsonHandler):
                 if user is None:
                     self.set_status(404, 'User not found')
                 else:
-                    """!!!!!!!!"""
-                    status_id = user.status_id  ##############
+
+                    status_id = user.status_id
                     user = self.json_data['account_name']
                     password = self.json_data['password']
                     password = self._create_sha(password)
                     email = self.json_data['email']
                     token = secrets.token_hex(8)
                     token_expire = self._token_expiration()
-                    """!!!!!!!!"""
                     user = CUsers(username=user, password=password, email=email, token=token,
                                   tokenexp=token_expire, status_id=status_id)  # это мы создали, а как апдейтить?!
 

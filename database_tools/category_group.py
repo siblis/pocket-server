@@ -13,3 +13,4 @@ session = Session()
 
 session.add_all([CCategoryGroup(category_name='Single'),
                  CCategoryGroup(category_name='Multi')])
+session.commit()

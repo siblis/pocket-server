@@ -40,7 +40,7 @@ groups = Table('groups', meta,
 
 user_groups = Table('user_groups', meta,
                     Column('user_id', Integer, ForeignKey('users.uid'), primary_key=True),
-                    Column('group_id', Integer, ForeignKey('groups.gid'), primary_key=True))
+                    Column('group_id', Integer, ForeignKey('groups.gid')))
 
 #---------------------------------------------------roles
 user_roles = Table('user_roles', meta,
@@ -54,7 +54,7 @@ status_of_user = Table('status_of_user', meta,
 ############
 coll_group = Table('coll_group', meta,
                    Column('collgroup_id', Integer, ForeignKey('groups.gid'), primary_key=True),
-                   Column('group_id', Integer, ForeignKey('groups.gid'), primary_key=True))
+                   Column('group_id', Integer, ForeignKey('groups.gid')))
 
 ############
 category_group = Table('category_group', meta,
