@@ -1,6 +1,6 @@
 from handlers.json_util import JsonHandler
 from database_tools.db_connect import Session
-from database_tools.alchemy import CGroups, CGroupsUsers, CMessagesChat
+from database_tools.alchemy import CGroups, CGroupsUsers, CMessages
 # from sqlalchemy import or_
 from handlers.chatshandler import group_get_in_name as group_get_in_name
 from handlers.chatshandler import group_get_in_id as group_get_in_id
@@ -13,7 +13,7 @@ TIME_DELTA = 30
 
 def add_message_in_group(session, group_id, from_id, to_id, message):
     creation_date = datetime.now()
-    msg = CMessagesChat(group_id=group_id, from_id=from_id, to_id=to_id, dtime=creation_date, message=message)
+    msg = CMessages(group_id=group_id, from_id=from_id, to_id=to_id, dtime=creation_date, message=message)
     session.add(msg)
     session.commit()
 
@@ -23,9 +23,9 @@ def get_group_in_users_id(session, group_id, user_id):
 
 
 def get_messages_in_group(session, group_id, start_dtime, end_dtime):
-    return session.query(CMessagesChat).filter(CMessagesChat.group_id == group_id,
-                                               CMessagesChat.dtime >= start_dtime,
-                                               CMessagesChat.dtime <= end_dtime).all()
+    return session.query(CMessages).filter(CMessages.group_id == group_id,
+                                           CMessages.dtime >= start_dtime,
+                                           CMessages.dtime <= end_dtime).all()
 
 
 class ChatsMessagesHandler(JsonHandler):
