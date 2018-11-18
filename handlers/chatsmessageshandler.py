@@ -91,7 +91,7 @@ class ChatsMessagesHandler(JsonHandler):
         # создание сообщений для группы(чата)
         if self._token_check():
             try:
-                group_name = self.json_data['group_name']
+                group_id = self.json_data['group_id']
                 from_id = self._token_check().uid
                 to_id = self.json_data['to_id']
                 message = self.json_data['message']
@@ -99,7 +99,7 @@ class ChatsMessagesHandler(JsonHandler):
                 self.send_error(400, message='Bad JSON')
                 return
             try:
-                result_group = group_get_in_name(self.db, group_name)
+                result_group = group_get_in_name(self.db, group_id)
             except:
                 self.send_error(500, message='Internal Server Error')
                 return
