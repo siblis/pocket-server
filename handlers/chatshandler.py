@@ -1,7 +1,7 @@
 from handlers.json_util import JsonHandler
 from database_tools.db_connect import Session
 from database_tools.alchemy import CMessages
-from database_tools.alchemy import CGroups, CGroupsUsers, CMessagesChat
+from database_tools.alchemy import CGroups, CGroupsUsers
 from datetime import datetime
 
 session = Session()
