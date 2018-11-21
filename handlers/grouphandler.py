@@ -29,7 +29,7 @@ class GroupHandler(JsonHandler):
             if exists_group is None:
                 group_name = self.json_data['group_name']
                 creation_date = self.json_data['creation_time']
-                creater_user_id = self.json_data['creater_user_id']
+                creater_user_id = self.json_data['user_id']
                 category_group = self.db.query(CCategoryGroup).filter(
                     CCategoryGroup.category_name == self.json_data['category_group']).first()
                 group = CGroups(group_name=group_name, creation_date=creation_date,
@@ -76,7 +76,7 @@ class GroupHandler(JsonHandler):
             group_name = self.json_data['group_name']
 
             """ Только создатель группы может её удалить """
-            check_id = self.json_data['uid']
+            check_id = self.json_data['user_id']
 
             created_user = self.db.query(CGroups).filter(CGroups.group_name == group_name).first()
             if check_id == created_user.creater_user_id:
