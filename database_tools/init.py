@@ -21,6 +21,7 @@ users = Table('users', meta,
 
 messages = Table('messages', meta,
                  Column('mid', Integer, primary_key=True),
+                 Column('group_id', Integer, ForeignKey('groups.gid')),
                  Column('to_id', Integer, ForeignKey('users.uid')),
                  Column('from_id', Integer, ForeignKey('users.uid')),
                  Column('message', String),
@@ -41,13 +42,12 @@ groups = Table('groups', meta,
 
 
 user_groups = Table('user_groups', meta,
-                    Column('user_id', Integer, ForeignKey('users.uid'), primary_key=True),
-                    Column('group_id', Integer, ForeignKey('groups.gid')))
+                    Column('user_id', ForeignKey('users.uid'), primary_key=True),
+                    Column('group_id', ForeignKey('groups.gid'), primary_key=True))
 
-#---------------------------------------------------roles
 user_roles = Table('user_roles', meta,
-              Column('roleid', primary_key=True),
-              Column('role_name'))
+              Column('roleid', Integer, primary_key=True),
+              Column('role_name', String))
 
 status_of_user = Table('status_of_user', meta,
                        Column('usid', Integer, primary_key=True),

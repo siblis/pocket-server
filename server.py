@@ -9,6 +9,7 @@ from handlers.authhandler import AuthHandler
 from handlers.usershandler import UsersHandler
 from handlers.usershandler import UsersHandlerId, UsersHandlerMail, UsersHandlerSearchByNickname
 from handlers.chatshandler import ChatsHandler
+from handlers.chatsmessageshandler import ChatsMessagesHandler
 from handlers.contactshandler import ContactsHandler
 from handlers.contactshandler import ContactsByIdHandler
 from handlers.wshandler import WebSocketHandler
@@ -44,7 +45,11 @@ class Application(tornado.web.Application):
             (r'/v1/ws/status/([0-9]+)', WebSocketStatusHandler),
             (r'/v1/ws_echo/', WebSocketHandlerEcho),
             (r'/v1/chats/', ChatsHandler),
-            (r'/v1/chats/add', ChatsHandler),
+            (r'/v1/chats/([0-9]+)', ChatsHandler),
+            (r'/v1/chats/([a-zA-Z][a-zA-Z0-9]{2,})', ChatsHandler),
+            (r'/v1/chats/messages/', ChatsMessagesHandler),
+            (r'/v1/chats/messages/(gruop-id=[0-9]{1,}&data=[0-9]{4}-[0-9]{2}-[0-9]{2}&time=[0-9]{2}:[0-9]{2}:[0-9]{2})', ChatsMessagesHandler),
+            # (r'/v1/chats/add', ChatsHandler),
         ]
 
         # если понадобится cookie_secret(для подписания cookie),
