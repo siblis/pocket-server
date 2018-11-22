@@ -56,7 +56,7 @@ class CMessages(CBase):
     p_to_id = relationship('CUsers', foreign_keys=[to_id])
 
     def __repr__(self):
-        return 'CMessages<mid = %d, from_id = %d, to_id = %d, message = %s' % (
+        return 'CMessages: mid = %d, from_id = %d, to_id = %d, message = %s' % (
             self.mid, self.from_id, self.to_id, self.message)
 
 
@@ -67,7 +67,7 @@ class CContacts(CBase):
     contact = Column(Integer(), ForeignKey('users.uid'))
 
     def __repr__(self):
-        return 'CContacts<cid = %d, user_id = %d, contact = %d' % (self.cid, self.user_id, self.contact)
+        return 'CContacts: cid = %d, user_id = %d, contact = %d' % (self.cid, self.user_id, self.contact)
     
 #------------------------------------------------
 class CGroups(CBase):
@@ -79,7 +79,7 @@ class CGroups(CBase):
         category_group = Column(Integer(), ForeignKey('category_group.category_id'))  ############
 
         def __repr__(self):
-            return 'CGroups<gid = %d,  name = %d' % (self.gid, self.group_name)
+            return 'CGroups: gid = %d,  name = %d' % (self.gid, self.group_name)
 
 
 class CGroupsUsers(CBase):
@@ -88,17 +88,18 @@ class CGroupsUsers(CBase):
     group_id = Column(Integer(), ForeignKey('groups.gid'))
 
     def __repr__(self):
-        return 'CGroupsUsers<user_id = {}, group_id = {}'.format(self.user_id, self.group_id)
+        return 'CGroupsUsers: user_id = {}, group_id = {}'.format(self.user_id, self.group_id)
 
 
 class CCollGroup(CBase):
     """ Коллекция групп ("группы в группе")"""
     __tablename__ = 'coll_group'
-    collgroup_id = Column(Integer(), ForeignKey('groups.gid'), primary_key=True)
+    clid = Column(Integer(), primary_key=True)
+    collgroup_id = Column(Integer(), ForeignKey('groups.gid'))
     group_id = Column(Integer(), ForeignKey('groups.gid'))
 
     def __repr__(self):
-        return 'CCollGroup<collgroup_id = {}, group_id = {}'.format(self.collgroup_id, self.group_id)
+        return 'CCollGroup: clid = {}, collgroup_id = {}, group_id = {}'.format(self.clid, self.collgroup_id, self.group_id)
 
 
 class CCategoryGroup(CBase):
@@ -108,5 +109,5 @@ class CCategoryGroup(CBase):
     category_name = Column(Unicode())
 
     def __repr__(self):
-        return 'CCategoryGroup<category_id = {}, category_name = {}'.format(self.category_id, self.category_name)
+        return 'CCategoryGroup: category_id = {}, category_name = {}'.format(self.category_id, self.category_name)
 

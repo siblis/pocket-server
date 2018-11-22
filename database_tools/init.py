@@ -55,7 +55,8 @@ status_of_user = Table('status_of_user', meta,
 
 
 coll_group = Table('coll_group', meta,
-                   Column('collgroup_id', Integer, ForeignKey('groups.gid'), primary_key=True),
+                   Column('clid', Integer, primary_key=True),
+                   Column('collgroup_id', Integer, ForeignKey('groups.gid')),
                    Column('group_id', Integer, ForeignKey('groups.gid')))
 
 
