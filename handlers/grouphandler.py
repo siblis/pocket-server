@@ -1,5 +1,5 @@
 from handlers.json_util import JsonHandler
-from database_tools.alchemy import CGroups
+from database_tools.alchemy import CGroups, CCategoryGroup, CCollGroup
 
 
 class GroupHandler(JsonHandler):
@@ -28,9 +28,12 @@ class GroupHandler(JsonHandler):
 
             if exists_group is None:
                 group_name = self.json_data['group_name']
-                creation_time = self.json_data['creation_time']
-                creater_user_id = self.json_data['creater_user_id']
-                group = CGroups(group_name=group_name, creation_time=creation_time, creater_user_id=creater_user_id)
+                creation_date = self.json_data['creation_time']
+                creater_user_id = self.json_data['user_id']
+                category_group = self.db.query(CCategoryGroup).filter(
+                    CCategoryGroup.category_name == self.json_data['category_group']).first()
+                group = CGroups(group_name=group_name, creation_date=creation_date,
+                                creater_user_id=creater_user_id, category_group=category_group.category_id)
                 self.db.add(group)
                 self.db.commit()
                 self.set_status(201, reason='Created')
@@ -39,18 +42,58 @@ class GroupHandler(JsonHandler):
                 message = 'Group already exists'
                 self.send_error(409, message=message)
 
+    def put(self):
+        """ Добавление в групп в коллекцию """
+
+        if self.check_result:
+            check_group = None
+            add_group = None
+            try:
+                check_group = self.db.query(CGroups.group_name).filter(
+                    CGroups.group_name == self.json_data['group_name']).one()
+                add_group = self.db.query(CGroups).filter(CGroups.group_name == self.json_data['add_group']).one()
+            except:
+                self.send_error(400, message='Please check group names')
+
+            if check_group is None:
+                message = 'Group not found'
+                self.send_error(409, message=message)
+
+            elif add_group is None:
+                message = 'Add group not found'
+                self.send_error(409, message=message)
+            else:
+                group = self.db.query(CGroups).filter(CGroups.group_name == self.json_data['group_name']).first()
+                add_group = self.db.query(CGroups).filter(CGroups.group_name == self.json_data['add_group']).first()
+                coll_group = CCollGroup(collgroup_id=group.gid, group_id=add_group.gid)
+                self.db.add(coll_group)
+                self.db.commit()
+                self.set_status(201, reason='Add group')
+                self.write_json()
+
     def delete(self):
         if self.check_result:
             group_name = self.json_data['group_name']
-            result = self.db.query(CGroups).filter(CGroups.group_name == group_name).one_or_none()
-            result_gid = self.db.query(CGroups).filter(CGroups.gid == result.gid).delete()
-            if not result_gid:
-                self.set_status(404, 'Group does not exists')
+
+            """ Только создатель группы может её удалить """
+            check_id = self.json_data['user_id']
+
+            created_user = self.db.query(CGroups).filter(CGroups.group_name == group_name).first()
+            if check_id == created_user.creater_user_id:
+
+                result = self.db.query(CGroups).filter(CGroups.group_name == group_name).one_or_none()
+                result_gid = self.db.query(CGroups).filter(CGroups.gid == result.gid).delete()
+                if not result_gid:
+                    self.set_status(404, 'Group does not exists')
+                else:
+                    self.db.commit()
+                    self.set_status(200)
+                    self.response['deleted_group_id'] = result.gid
+                    self.response['deleted_group_name'] = result.group_name
+                    self.write_json()
+
             else:
-                self.db.commit()
-                self.set_status(200)
-                self.response['deleted_group_id'] = result.gid
-                self.response['deleted_group_name'] = result.group_name
-                self.write_json()
+                self.send_error(400, message='You not are a creator group')
+
         else:
             self.send_error(400)

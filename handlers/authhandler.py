@@ -1,5 +1,5 @@
 from handlers.json_util import JsonHandler
-from database_tools.alchemy import CUsers
+from database_tools.alchemy import CUsers, CUserStatus
 from sqlalchemy import update
 import secrets
 
@@ -18,7 +18,10 @@ class AuthHandler(JsonHandler):
             if passwd == result_db:
                 token = secrets.token_hex(8)
                 token_exp = self._token_expiration()
-                query = update(CUsers).where(CUsers.username == login).values(token=token, tokenexp=token_exp)
+                status = self.db.query(CUserStatus).filter(CUserStatus.status_name == 'online').first()
+                query = update(CUsers).where(CUsers.username == login).values(token=token,
+                                                                              tokenexp=token_exp,
+                                                                              status_id=status.usid)
                 self.db.execute(query)
                 self.db.commit()
                 self.set_status(200)
