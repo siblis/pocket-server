@@ -48,16 +48,20 @@ class CMessages(CBase):
 
     mid = Column(Integer(), primary_key=True)
     message = Column(Unicode())
+    group_id = Column(Integer(), ForeignKey('groups.gid'))
     from_id = Column(Integer(), ForeignKey('users.uid'))
     to_id = Column(Integer(), ForeignKey('users.uid'))
     dtime = Column(Unicode())
 
+    p_group_id = relationship('CGroups', foreign_keys=[group_id])
     p_from_id = relationship('CUsers', foreign_keys=[from_id])
     p_to_id = relationship('CUsers', foreign_keys=[to_id])
 
     def __repr__(self):
-        return 'CMessages<mid = %d, from_id = %d, to_id = %d, message = %s' % (
-            self.mid, self.from_id, self.to_id, self.message)
+        # return 'CMessages<mid = %d, from_id = %d, to_id = %d, message = %s' % (
+        #     self.mid, self.from_id, self.to_id, self.message)
+        return f'CMessages<mid = {self.mid}, group_id={self.group_id}, from_id = {self.from_id}, to_id = {self.to_id},' \
+               f' message = {self.message}, dtime = {self.dtime}'
 
 
 class CContacts(CBase):
@@ -73,11 +77,11 @@ class CContacts(CBase):
 class CGroups(CBase):
         __tablename__ = 'groups'
         gid = Column(Integer(), primary_key=True)
-        creation_time = Column(DateTime, default=datetime.datetime.utcnow())
-        group_name = Column(Unicode())
+        creation_date = Column(DateTime, default=datetime.datetime.utcnow())
+        groupname = Column(Unicode())
         creater_user_id = Column(Integer())
         def __repr__(self):
-            return 'CGroups<gid = %d,  name = %d' % (self.gid, self.group_name)
+            return 'CGroups<gid = %d, name = %d' % (self.gid, self.group_name)
 
 
 class CGroupsUsers(CBase):
@@ -85,4 +89,23 @@ class CGroupsUsers(CBase):
 
     user_id = Column(Integer(), ForeignKey('users.uid'),primary_key=True)
     group_id = Column(Integer(), ForeignKey('groups.gid'), primary_key=True)
+    def __repr__(self):
+        return f'CGroupsUsers<user_id = {self.user_id}, group_id = {self.group_id}'
 
+
+# class CMessagesChat(CBase):
+#     __tablename__ = 'messages_chat'
+#
+#     mid = Column(Integer(), primary_key=True)
+#     message = Column(Unicode())
+#     group_id = Column(Integer(), ForeignKey('groups.gid'))
+#     from_id = Column(Integer(), ForeignKey('users.uid'))
+#     to_id = Column(Integer(), ForeignKey('users.uid'))
+#     dtime = Column(DateTime())
+#
+#     p_group_id = relationship('CGroups', foreign_keys=[group_id])
+#     p_from_id = relationship('CUsers', foreign_keys=[from_id])
+#     p_to_id = relationship('CUsers', foreign_keys=[to_id])
+#
+#     def __repr__(self):
+#         return f'CMessages<mid = {self.mid}, group_id={self.group_id}, from_id = {self.from_id}, to_id = {self.to_id}, message = {self.message}, dtime = {self.dtime}'
