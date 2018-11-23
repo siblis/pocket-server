@@ -3,8 +3,10 @@ from database_tools.db_connect import Session
 from database_tools.alchemy import CMessages
 from database_tools.alchemy import CGroups, CGroupsUsers
 from datetime import datetime
+from handlers.wshandler import WebSocketHandler
 
 session = Session()
+logger = WebSocketHandler.logger
 
 
 # class ChatsHandler(JsonHandler):
@@ -27,11 +29,12 @@ session = Session()
 def group_creat(session, id_user, group_name):
     try:
         result = group_get_in_name(session, group_name)
-    except:
+    except Exception as e:
+        logger.error("Error message: " + str(e))
         raise ValueError("Error BD")
     if result is None:
         creation_date = datetime.now()
-        msg = CGroups(creater_user_id=id_user, groupname=group_name, creation_date=creation_date)
+        msg = CGroups(creater_user_id=id_user, group_name=group_name, creation_date=creation_date)
         session.add(msg)
         session.commit()
     else:
@@ -61,7 +64,7 @@ def group_get_in_id(session, group_id):
 
 def group_get_in_name(session, group_name):
     # Возврщяет информацию о группе через имя группы
-    return session.query(CGroups).filter_by(groupname=group_name).first()
+    return session.query(CGroups).filter_by(group_name=group_name).first()
 
 
 def group_users_get_in_id(session, group_id):
@@ -84,23 +87,26 @@ class ChatsHandler(JsonHandler):
                 # Цифры
                 try:
                     result_group = group_get_in_id(self.db, group_or_name_or_id)
-                except:
+                except Exception as e:
+                    logger.error("Error message: " + str(e))
                     self.send_error(500, message='Internal Server Error')
                     return
             else:
                 # строка
                 try:
                     result_group = group_get_in_name(self.db, group_or_name_or_id)
-                except:
+                except Exception as e:
+                    logger.error("Error message: " + str(e))
                     self.send_error(500, message='Internal Server Error')
                     return
             if result_group is not None:
                 self.response['gid'] = result_group.gid
-                self.response['group_name'] = result_group.groupname
+                self.response['group_name'] = result_group.group_name
                 self.response['users'] = []
                 try:
                     result_users_group = group_users_get_in_id(self.db, result_group.gid)
-                except:
+                except Exception as e:
+                    logger.error("Error message: " + str(e))
                     self.send_error(500, message='Internal Server Error')
                     return
                 for user in result_users_group:
@@ -119,12 +125,14 @@ class ChatsHandler(JsonHandler):
             try:
                 group_name = self.json_data['group_name']
                 creater_user_id = self._token_check().uid
-            except:
+            except Exception as e:
+                logger.error("Error message: " + str(e))
                 self.send_error(400, message='Bad JSON')
                 return
             try:
                 result = group_get_in_name(self.db, group_name)
-            except:
+            except Exception as e:
+                logger.error("Error message: " + str(e))
                 self.send_error(500, message='Internal Server Error')
                 return
             if result is None:
@@ -134,9 +142,11 @@ class ChatsHandler(JsonHandler):
                     group_id = group_get_in_name(self.db, group_name).gid
                     group_user_add(self.db, creater_user_id, group_id)
                 except ValueError as err:
+                    logger.error("Error message: " + str(err))
                     self.send_error(500, message=err)
                     return
-                except:
+                except Exception as e:
+                    logger.error("Error message: " + str(e))
                     self.send_error(500, message='Internal Server Error')
                     return
                 self.response['message'] = "Group creat"
@@ -152,14 +162,16 @@ class ChatsHandler(JsonHandler):
         # добавление пользователя в группу(чат)
         if self._token_check():
             try:
-                group_name = self.json_data['group_name']
+                group_id = self.json_data['group_id']
                 new_user_id = self.json_data['new_user_id']
-            except:
+            except Exception as e:
+                logger.error("Error message: " + str(e))
                 self.send_error(400, message='Bad JSON')
                 return
             try:
-                result = group_get_in_name(self.db, group_name)
-            except:
+                result = group_get_in_id(self.db, group_id)
+            except Exception as e:
+                logger.error("Error message: " + str(e))
                 self.send_error(500, message='Internal Server Error')
                 return
             if result is not None:
@@ -167,7 +179,8 @@ class ChatsHandler(JsonHandler):
                 # група существует, проверяем не ли там уже этого пользователя
                 try:
                     result_user_is_in_group = user_is_in_group(self.db, new_user_id, group_id)
-                except:
+                except Exception as e:
+                    logger.error("Error message: " + str(e))
                     self.send_error(500, message='Internal Server Error')
                     return
                 if result_user_is_in_group is None:
@@ -175,9 +188,11 @@ class ChatsHandler(JsonHandler):
                     try:
                         group_user_add(self.db, new_user_id, group_id)
                     except ValueError as err:
+                        logger.error("Error message: " + str(err))
                         self.send_error(500, message=err)
                         return
-                    except:
+                    except Exception as e:
+                        logger.error("Error message: " + str(e))
                         self.send_error(500, message='Internal Server Error')
                         return
                     self.response['message'] = "User add group"
@@ -197,12 +212,14 @@ class ChatsHandler(JsonHandler):
             try:
                 group_name = self.json_data['group_name']
                 user_id = self.json_data['user_id']
-            except:
+            except Exception as e:
+                logger.error("Error message: " + str(e))
                 self.send_error(400, message='Bad JSON')
                 return
             try:
                 result = group_get_in_name(self.db, group_name)
-            except:
+            except Exception as e:
+                logger.error("Error message: " + str(e))
                 self.send_error(500, message='Internal Server Error')
                 return
             if result is not None:
@@ -210,14 +227,16 @@ class ChatsHandler(JsonHandler):
                 # Проверяем пользователь находится ли в группе
                 try:
                     result_user_ia_in_group = user_is_in_group(self.db, id_user=user_id, group_id=group_id)
-                except:
+                except Exception as e:
+                    logger.error("Error message: " + str(e))
                     self.send_error(500, message='Internal Server Error')
                     return
                 if result_user_ia_in_group is not None:
                     # група существует, удалить пользователя
                     try:
                         delete_user_is_in_group(self.db, id_user=user_id, group_id=group_id)
-                    except:
+                    except Exception as e:
+                        logger.error("Error message: " + str(e))
                         self.send_error(500, message='Internal Server Error')
                         return
                     self.response['message'] = "User delete group"
