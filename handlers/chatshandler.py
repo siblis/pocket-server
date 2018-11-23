@@ -162,14 +162,14 @@ class ChatsHandler(JsonHandler):
         # добавление пользователя в группу(чат)
         if self._token_check():
             try:
-                group_name = self.json_data['group_name']
+                group_id = self.json_data['group_id']
                 new_user_id = self.json_data['new_user_id']
             except Exception as e:
                 logger.error("Error message: " + str(e))
                 self.send_error(400, message='Bad JSON')
                 return
             try:
-                result = group_get_in_name(self.db, group_name)
+                result = group_get_in_id(self.db, group_id)
             except Exception as e:
                 logger.error("Error message: " + str(e))
                 self.send_error(500, message='Internal Server Error')
