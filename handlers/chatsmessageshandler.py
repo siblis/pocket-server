@@ -5,8 +5,10 @@ from database_tools.alchemy import CGroups, CGroupsUsers, CMessages
 from handlers.chatshandler import group_get_in_name as group_get_in_name
 from handlers.chatshandler import group_get_in_id as group_get_in_id
 from datetime import datetime, timedelta
+from handlers.wshandler import WebSocketHandler
 
 session = Session()
+logger = WebSocketHandler.logger
 
 TIME_DELTA = 30
 
@@ -95,12 +97,14 @@ class ChatsMessagesHandler(JsonHandler):
                 from_id = self._token_check().uid
                 to_id = self.json_data['to_id']
                 message = self.json_data['message']
-            except:
+            except Exception as e:
+                logger.error("Error message: " + str(e))
                 self.send_error(400, message='Bad JSON')
                 return
             try:
-                result_group = group_get_in_name(self.db, group_id)
-            except:
+                result_group = group_get_in_id(self.db, group_id)
+            except Exception as e:
+                logger.error("Error message: " + str(e))
                 self.send_error(500, message='Internal Server Error')
                 return
             if result_group is not None:
@@ -109,13 +113,15 @@ class ChatsMessagesHandler(JsonHandler):
                 try:
                     # От кого
                     from_user_in_group = get_group_in_users_id(self.db, group_id=result_group.gid, user_id=from_id)
-                except:
+                except Exception as e:
+                    logger.error("Error message: " + str(e))
                     self.send_error(500, message='Internal Server Error')
                     return
                 try:
                     # От для кого
                     to_user_in_group = get_group_in_users_id(self.db, group_id=result_group.gid, user_id=to_id)
-                except:
+                except Exception as e:
+                    logger.error("Error message: " + str(e))
                     self.send_error(500, message='Internal Server Error')
                     return
 
@@ -130,7 +136,8 @@ class ChatsMessagesHandler(JsonHandler):
                 try:
                     add_message_in_group(self.db, group_id=result_group.gid, from_id=from_id, to_id=to_id,
                                          message=message)
-                except:
+                except Exception as e:
+                    logger.error("Error message: " + str(e))
                     self.send_error(500, message='Internal Server Error')
                     return
                 self.response['message'] = "Messages add group"
