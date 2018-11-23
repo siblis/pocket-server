@@ -44,7 +44,8 @@ class ChatsMessagesHandler(JsonHandler):
                     result[key] = itam
                 group_id = int(result['gruop-id'])
                 start_dtime = datetime.strptime(f"{result['data']} {result['time']}", '%Y-%m-%d %H:%M:%S')
-            except:
+            except Exception as e:
+                logger.error("Error message: " + str(e))
                 self.send_error(404, message='Bad Data')
                 return
             user_id = self._token_check().uid
@@ -52,7 +53,8 @@ class ChatsMessagesHandler(JsonHandler):
             # Проверка существоет ли группы
             try:
                 group_exists = group_get_in_id(self.db, group_id)
-            except:
+            except Exception as e:
+                logger.error("Error message: " + str(e))
                 self.send_error(500, message='Internal Server Error')
                 return
             if group_exists is None:
@@ -61,7 +63,8 @@ class ChatsMessagesHandler(JsonHandler):
             # Проверка входет ли пользователь в группу
             try:
                 user_in_group = get_group_in_users_id(self.db, group_id=group_id, user_id=user_id)
-            except:
+            except Exception as e:
+                logger.error("Error message: " + str(e))
                 self.send_error(500, message='Internal Server Error')
                 return
             if user_in_group is None:
@@ -70,7 +73,8 @@ class ChatsMessagesHandler(JsonHandler):
             # Получение сообщений пользователей
             try:
                 result = get_messages_in_group(self.db, group_id=group_id, start_dtime=start_dtime, end_dtime=end_dtime)
-            except:
+            except Exception as e:
+                logger.error("Error message: " + str(e))
                 self.send_error(500, message='Internal Server Error')
                 return
             if result is not None:
