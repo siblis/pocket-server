@@ -132,7 +132,7 @@ class ChatsHandler(JsonHandler):
                 return
             # Регулярное выродение для проверки группы
 
-            if re.search(r'^[a-zA-Z0-9][a-zA-Z0-9]{2,}', group_name) is None:
+            if re.search(r'^[a-zA-Z0-9]{3,}', group_name) is None:
                 err = 'Invalid group name'
                 logger.error("Error message: " + str(err))
                 self.send_error(404, message=err)
