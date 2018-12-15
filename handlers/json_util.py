@@ -7,6 +7,11 @@ from datetime import datetime, timedelta
 
 
 class BaseHandler(tornado.web.RequestHandler):
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+
     @property
     def db(self):
         return self.application.db
@@ -52,12 +57,10 @@ class JsonHandler(BaseHandler):
                         return query_db
             else:
                 message = 'Token not found'
-                self.set_status(404, reason=message)
+                self.set_status(401, reason=message)
         else:
             message = 'Unauthorized'
-            self.set_status(401, reason=message)
-
-
+            self.set_status(403, reason=message)
 
     def prepare(self):
         if self.request.body:
@@ -70,7 +73,7 @@ class JsonHandler(BaseHandler):
         self.response = dict()
 
     def set_response(self, result):
-        self.response['uid'] = result.uid
+        self.response['user_id'] = result.uid
         self.response['account_name'] = result.username
         self.response['email'] = result.email
 
