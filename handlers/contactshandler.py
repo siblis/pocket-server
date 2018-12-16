@@ -55,6 +55,7 @@ class ContactsHandler(JsonHandler):
             records = query.all()
 
             ws_dict = WebSocketHandler.ws_dict
+            contact_list = []
 
             for i in range(len(records)):
                 status = 'offline'
@@ -63,8 +64,10 @@ class ContactsHandler(JsonHandler):
                         status = 'online'
                     else:
                         status = 'offline'
-                self.response[i] = {'user_id': records[i].CUsers.uid,
-                                    'account_name': records[i].CUsers.username,
-                                    'email': records[i].CUsers.email,
-                                    'status': status}
+
+                contact_list.append({'user_id': records[i].CUsers.uid,
+                          'account_name': records[i].CUsers.username,
+                          'email': records[i].CUsers.email,
+                          'status': status})
+            self.response = contact_list
             self.write_json()
