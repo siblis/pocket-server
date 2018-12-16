@@ -1,5 +1,6 @@
 from handlers.json_util import JsonHandler
 from database_tools.alchemy import CUsers, CContacts
+from handlers.wshandler import WebSocketHandler
 
 
 class ContactsHandler(JsonHandler):
@@ -13,8 +14,9 @@ class ContactsHandler(JsonHandler):
             try:
                 contact = self.json_data['contact']
                 exists_contact = self.db.query(CUsers).filter(CUsers.email == contact).one_or_none()
-            except:
-                self.send_error(400, reason='No or bad request body')
+            except Exception as e:
+                print(e)
+                self.send_error(400, reason='Bad request body')
             if exists_contact is None:
                 self.set_status(404, 'User does not exists')
             else:
@@ -45,27 +47,24 @@ class ContactsHandler(JsonHandler):
                 self.response['deleted_contact_id'] = result.uid
                 self.response['deleted_contact_username'] = result.username
                 self.write_json()
-        else:
-            self.send_error(400)
 
     def get(self):
         if self.check_result:
             contacts = self.db.query(CContacts, CUsers).filter(CContacts.user_id == self.check_result.uid)
             query = contacts.join(CUsers, CUsers.uid == CContacts.contact)
             records = query.all()
-            for i in range(len(records)):
-                self.response[records[i].CUsers.email] = {'id': records[i].CUsers.uid,
-                                                          'name': records[i].CUsers.username}
-            self.write_json()
 
+            ws_dict = WebSocketHandler.ws_dict
 
-class ContactsByIdHandler(ContactsHandler):
-    def get(self):
-        super().prepare()
-        if self.check_result:
-            contacts = self.db.query(CContacts, CUsers).filter(CContacts.user_id == self.check_result.uid)
-            query = contacts.join(CUsers, CUsers.uid == CContacts.contact)
-            records = query.all()
             for i in range(len(records)):
-                self.response[i] = {'id': records[i].CUsers.uid}
+                status = 'offline'
+                for key in ws_dict.keys():
+                    if records[i].CUsers.uid == ws_dict[key].user_id:
+                        status = 'online'
+                    else:
+                        status = 'offline'
+                self.response[i] = {'user_id': records[i].CUsers.uid,
+                                    'account_name': records[i].CUsers.username,
+                                    'email': records[i].CUsers.email,
+                                    'status': status}
             self.write_json()

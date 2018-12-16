@@ -1,3 +1,4 @@
+import re
 from handlers.json_util import JsonHandler
 from database_tools.db_connect import Session
 from database_tools.alchemy import CMessages
@@ -128,6 +129,13 @@ class ChatsHandler(JsonHandler):
             except Exception as e:
                 logger.error("Error message: " + str(e))
                 self.send_error(400, message='Bad JSON')
+                return
+            # Регулярное выродение для проверки группы
+
+            if re.search(r'^[a-zA-Z0-9]{3,}', group_name) is None:
+                err = 'Invalid group name'
+                logger.error("Error message: " + str(err))
+                self.send_error(404, message=err)
                 return
             try:
                 result = group_get_in_name(self.db, group_name)

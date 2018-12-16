@@ -93,21 +93,3 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler, JsonHandler):
         except:
             self.logger.info("No session in DICT")
 
-
-class WebSocketStatusHandler(WebSocketHandler):
-    def get(self, user_id):
-        super().prepare()
-        self.response = dict()
-        if len(self.ws_dict.keys()) > 0:
-            for key in self.ws_dict.keys():
-                if self.ws_dict[key].user_id == int(user_id):
-                    self.response['user_id'] = self.ws_dict[key].user_id
-                    self.response['user_name'] = self.ws_dict[key].user_name
-                    self.response['user_email'] = self.ws_dict[key].user_email
-                    self.response['user_status'] = 'online'
-                    self.set_status(200)
-                    self.write_json()
-                else:
-                    self.set_status(404, 'User offline or not found')
-        else:
-            self.set_status(404, 'No users online')
