@@ -27,20 +27,20 @@ class Application(tornado.web.Application):
         self.webSocketsPool = []
         handlers = [
             (r'/v1', MainHandler),
-            (r'/v1/auth/', AuthHandler),
-            (r'/v1/auth/login/', AuthHandlerLogin),
-            (r'/v1/auth/register/', AuthHandlerRegister),
-            (r'/v1/account/', UsersHandler),
-            (r'/v1/account/contacts/', ContactsHandler),
+            (r'/v1/auth/?', AuthHandler),
+            (r'/v1/auth/login/?', AuthHandlerLogin),
+            (r'/v1/auth/register/?', AuthHandlerRegister),
+            (r'/v1/account/?', UsersHandler),
+            (r'/v1/account/contacts/?', ContactsHandler),
             (r'/v1/users/([0-9]+)', UsersHandlerId),
 
             (r'/v1/users/([a-zA-Z][a-zA-Z0-9]{2,})', UsersHandlerSearchByNickname),
             (r'/v1/users/([a-z0-9!#$%&\'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)', UsersHandlerMail),
             (r'/v1/users/groups/', GroupHandler),
 
-            (r'/v1/ws/', WebSocketHandler),
+            (r'/v1/ws/?', WebSocketHandler),
 
-            (r'/v1/chats/', ChatsHandler),
+            (r'/v1/chats/?', ChatsHandler),
             (r'/v1/chats/([0-9]+)', ChatsHandler),
             (r'/v1/chats/([a-zA-Z0-9]{3,})', ChatsHandler),
             (r'/v1/chats/messages/', ChatsMessagesHandler),
