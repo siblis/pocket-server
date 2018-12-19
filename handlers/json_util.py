@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 
 class BaseHandler(tornado.web.RequestHandler):
-    def set_default_headers(self):
+    def set_server_headers(self):
         self.set_header('Access-Control-Allow-Origin', '*')
         self.set_header('Access-Control-Allow-Headers',
                         'x-requested-with, access-control-allow-origin, authorization, content-type, origin, accept')
@@ -17,10 +17,6 @@ class BaseHandler(tornado.web.RequestHandler):
     @property
     def db(self):
         return self.application.db
-
-    def options(self):
-        self.set_status(204)
-        self.finish()
 
 
 class JsonHandler(BaseHandler):
@@ -97,3 +93,4 @@ class JsonHandler(BaseHandler):
     def write_json(self):
         output = tornado.escape.json_encode(self.response)
         self.write(output)
+        self.set_server_headers()
