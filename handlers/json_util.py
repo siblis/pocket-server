@@ -9,15 +9,10 @@ from datetime import datetime, timedelta
 class BaseHandler(tornado.web.RequestHandler):
     def set_default_headers(self):
         self.set_header('Access-Control-Allow-Origin', '*')
-        self.set_header('Access-Control-Allow-Headers', 'x-requested-with')
-        self.set_header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, HEAD, OPTIONS')
-        self.set_header('Access-Control-Allow-Headers', 'access-control-allow-origin, authorization, content-type')
-        self.set_header('Access-Control-Allow-Headers', 'origin, accept')
-        self.set_header('Access-Control-Allow-Credentials', 'true')
-        self.set_header('Access-Control-Expose-Headers', "Content-Type")
         self.set_header('Access-Control-Allow-Headers',
-                        "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, X-Requested-By, "
-                        "If-Modified-Since, X-File-Name, Cache-Control")
+                        'x-requested-with, access-control-allow-origin, authorization, content-type, origin, accept')
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, HEAD, OPTIONS')
+        self.set_header('Access-Control-Allow-Credentials', 'true')
 
     @property
     def db(self):
