@@ -14,6 +14,10 @@ class BaseHandler(tornado.web.RequestHandler):
         self.set_header('Access-Control-Allow-Headers', 'access-control-allow-origin, authorization, content-type')
         self.set_header('Access-Control-Allow-Headers', 'origin, accept')
         self.set_header('Access-Control-Allow-Credentials', 'true')
+        self.set_header('Access-Control-Expose-Headers', "Content-Type")
+        self.set_header('Access-Control-Allow-Headers',
+                        "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, X-Requested-By, "
+                        "If-Modified-Since, X-File-Name, Cache-Control")
 
     @property
     def db(self):
