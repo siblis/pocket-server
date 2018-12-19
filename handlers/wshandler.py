@@ -24,7 +24,27 @@ class UserData(NamedTuple):
     ws_object: 'WebSocketHandler'
 
 
+class WebSocketHandlerSecond(tornado.websocket.WebSocketHandler):
+    clients = []
+
+    def check_origin(self, origin):
+        return True
+
+    def open(self):
+        self.clients.append(self)
+        self.write_message("WebSocket opened")
+
+    def on_message(self, message):
+        for client in self.clients:
+            client.write_message(u"You said: " + message)
+
+    def on_close(self):
+        self.clients.remove(self)
+        print("WebSocket closed")
+
+
 class WebSocketHandler(tornado.websocket.WebSocketHandler, JsonHandler):
+    # clients = []
     ws_dict = dict()
     log_handler = logging.handlers.RotatingFileHandler(filename=LOG_FULL_PATH, maxBytes=900 * 1024, backupCount=3)
     log_formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='[%d/%m/%Y %H:%M:%S]')
@@ -55,12 +75,20 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler, JsonHandler):
             self.send_error(401)
 
     def open(self):
+        # Web Socket
+        # self.clients.append(self)
+        # self.write_message("WebSocket opened")
+        # Get Post Put Delete
         self.session = self._gen_session()
         self.logger.info(f'WebSocket opened, {self.session}')
         self.user_tuple = UserData(self.uid, self.username, self.usermail, self)
         self.ws_dict[self.session] = self.user_tuple
 
     def on_message(self, message):
+        # # Web Socket
+        # for client in self.clients:
+        #     client.write_message(u"You said: " + message)
+        # Get Post Put Delete
         self.logger.info(f'Come message {message} from id {self.uid} and sessid {self.session}')
         json_data = dict()
         try:
@@ -87,9 +115,12 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler, JsonHandler):
             self.write_message({"response": "400", "message": message})
 
     def on_close(self):
+        # Web Socket
+        # self.clients.remove(self)
+        # print("WebSocket closed")
+        # Get Post Put Delete
         self.logger.info(f'WebSocket closed, {self.session}')
         try:
             self.ws_dict.pop(self.session)
         except:
             self.logger.info("No session in DICT")
-

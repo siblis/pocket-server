@@ -13,7 +13,7 @@ from handlers.usershandler import UsersHandlerId, UsersHandlerMail, UsersHandler
 from handlers.chatshandler import ChatsHandler
 from handlers.chatsmessageshandler import ChatsMessagesHandler
 from handlers.contactshandler import ContactsHandler
-from handlers.wshandler import WebSocketHandler
+from handlers.wshandler import WebSocketHandler, WebSocketHandlerSecond
 from handlers.grouphandler import GroupHandler
 from database_tools.db_connect import Session
 
@@ -46,6 +46,8 @@ class Application(tornado.web.Application):
             (r'/v1/chats/messages/', ChatsMessagesHandler),
             (r'/v1/chats/messages/(gruop-id=[0-9]{1,}&data=[0-9]{4}-[0-9]{2}-[0-9]{2}&time=[0-9]{2}:[0-9]{2}:[0-9]{2})', ChatsMessagesHandler),
             # (r'/v1/chats/add', ChatsHandler),
+
+            (r'/v2/ws/', WebSocketHandlerSecond),
         ]
 
         # если понадобится cookie_secret(для подписания cookie),
