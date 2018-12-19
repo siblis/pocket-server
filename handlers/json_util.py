@@ -11,7 +11,9 @@ class BaseHandler(tornado.web.RequestHandler):
         self.set_header('Access-Control-Allow-Origin', '*')
         self.set_header('Access-Control-Allow-Headers', 'x-requested-with')
         self.set_header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, HEAD, OPTIONS')
-        self.set_header("Access-Control-Allow-Headers", 'access-control-allow-origin, authorization, content-type')
+        self.set_header('Access-Control-Allow-Headers', 'access-control-allow-origin, authorization, content-type')
+        self.set_header('Access-Control-Allow-Headers', 'origin, accept')
+        self.set_header('Access-Control-Allow-Credentials', 'true')
 
     @property
     def db(self):
