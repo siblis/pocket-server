@@ -7,13 +7,6 @@ from datetime import datetime, timedelta
 
 
 class BaseHandler(tornado.web.RequestHandler):
-    def set_server_headers(self):
-        self.set_header('Access-Control-Allow-Origin', '*')
-        self.set_header('Access-Control-Allow-Headers',
-                        'x-requested-with, access-control-allow-origin, authorization, content-type, origin, accept')
-        self.set_header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, HEAD, OPTIONS')
-        self.set_header('Access-Control-Allow-Credentials', 'true')
-
     @property
     def db(self):
         return self.application.db
@@ -80,7 +73,11 @@ class JsonHandler(BaseHandler):
         self.response['email'] = result.email
 
     def set_default_headers(self):
-        self.set_header('Content-Type', 'application/json')
+        self.set_header('Access-Control-Allow-Origin', '*')
+        self.set_header('Access-Control-Allow-Headers',
+                        'x-requested-with, access-control-allow-origin, authorization, content-type, origin, accept')
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, HEAD, OPTIONS')
+        self.set_header('Access-Control-Allow-Credentials', 'true')
 
     def write_error(self, status_code, **kwargs):
         if self.get_status() is None:
@@ -93,4 +90,3 @@ class JsonHandler(BaseHandler):
     def write_json(self):
         output = tornado.escape.json_encode(self.response)
         self.write(output)
-        self.set_server_headers()
